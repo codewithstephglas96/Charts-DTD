@@ -62,13 +62,15 @@
       }
 
       .header h1 {
-        font-size: clamp(14px, 5vw, 24px);
+        font-size: clamp(20px, 4vw, 32px);
+        line-height: 1.1;
         font-weight: 800;
         background: linear-gradient(135deg, #ffd700, #ffa500);
         -webkit-background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
-        line-height: 1.2;
+        margin-bottom: 8px;
+        white-space: normal;
       }
 
       body.light-mode .header h1 {
@@ -384,10 +386,20 @@
       }
 
       /* Ensure table cells have proper borders for captured image */
-      .export-table th,
+      .export-table th {
+        background: #fbfbfc;
+        color: #333;
+        border: 1px solid #ccc;
+        padding: 6px;
+        text-transform: uppercase;
+        text-align: center;
+        vertical-align: middle;
+        font-size: 10px;
+      }
+
       .export-table td {
         border: 1px solid #ddd;
-        padding: 6px;
+        padding: 2px 2px;
         text-align: center;
         vertical-align: middle;
       }
@@ -783,67 +795,15 @@
         <div class="game-container" id="pw-container">Loading...</div>
 
         <!-- Real-time draws for Play Whe -->
-        <div
-          class="realtime-draws"
-          id="pw-realtime"
-          style="
-            margin-top: 20px;
-            padding: 12px;
-            background: #0f172a;
-            border-radius: 12px;
-            border: 1px solid #334155;
-          "
-        >
-          <div
-            class="realtime-header"
-            style="
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              margin-bottom: 10px;
-              padding-bottom: 8px;
-              border-bottom: 1px solid #334155;
-            "
-          >
-            <h3
-              style="
-                color: #58a6ff;
-                font-size: 14px;
-                font-weight: 600;
-                margin: 0;
-              "
-            >
-              🔴 LIVE - TODAY
-            </h3>
-            <span
-              class="realtime-time"
-              id="pw-realtime-time"
-              style="color: #888; font-size: 11px"
-              >Loading...</span
-            >
-          </div>
-          <div
-            class="realtime-grid"
-            id="pw-realtime-grid"
-            style="
-              display: grid;
-              grid-template-columns: repeat(4, 1fr);
-              gap: 12px;
-            "
-          >
-            <div
-              class="realtime-card"
-              style="
-                background: #1e293b;
-                border-radius: 10px;
-                padding: 10px;
-                text-align: center;
-              "
-            >
-              Loading...
+          <div class="realtime-draws" id="pw-realtime">
+            <div class="realtime-header">
+              <h3>🔴 LIVE - TODAY</h3>
+              <span class="realtime-time" id="pw-realtime-time">Loading...</span>
+            </div>
+            <div class="realtime-grid" id="pw-realtime-grid">
+              <div class="realtime-card">Loading...</div>
             </div>
           </div>
-        </div>
       </div>
 
       <!-- Pick 2 Card -->
@@ -862,67 +822,15 @@
         <div class="game-container" id="p2-container">Loading...</div>
 
         <!-- Real-time draws for Pick 2 -->
-        <div
-          class="realtime-draws"
-          id="p2-realtime"
-          style="
-            margin-top: 20px;
-            padding: 12px;
-            background: #0f172a;
-            border-radius: 12px;
-            border: 1px solid #334155;
-          "
-        >
-          <div
-            class="realtime-header"
-            style="
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              margin-bottom: 10px;
-              padding-bottom: 8px;
-              border-bottom: 1px solid #334155;
-            "
-          >
-            <h3
-              style="
-                color: #58a6ff;
-                font-size: 14px;
-                font-weight: 600;
-                margin: 0;
-              "
-            >
-              🔴 LIVE - TODAY
-            </h3>
-            <span
-              class="realtime-time"
-              id="p2-realtime-time"
-              style="color: #888; font-size: 11px"
-              >Loading...</span
-            >
-          </div>
-          <div
-            class="realtime-grid"
-            id="p2-realtime-grid"
-            style="
-              display: grid;
-              grid-template-columns: repeat(4, 1fr);
-              gap: 12px;
-            "
-          >
-            <div
-              class="realtime-card"
-              style="
-                background: #1e293b;
-                border-radius: 10px;
-                padding: 10px;
-                text-align: center;
-              "
-            >
-              Loading...
+          <div class="realtime-draws" id="p2-realtime">
+            <div class="realtime-header">
+              <h3>🔴 LIVE - TODAY</h3>
+              <span class="realtime-time" id="p2-realtime-time">Loading...</span>
+            </div>
+            <div class="realtime-grid" id="p2-realtime-grid">
+              <div class="realtime-card">Loading...</div>
             </div>
           </div>
-        </div>
       </div>
 
       <!-- Pick 4 Card -->
@@ -941,67 +849,15 @@
         <div class="game-container" id="p4-container">Loading...</div>
 
         <!-- Real-time draws for Pick 4 -->
-        <div
-          class="realtime-draws"
-          id="p4-realtime"
-          style="
-            margin-top: 20px;
-            padding: 12px;
-            background: #0f172a;
-            border-radius: 12px;
-            border: 1px solid #334155;
-          "
-        >
-          <div
-            class="realtime-header"
-            style="
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              margin-bottom: 10px;
-              padding-bottom: 8px;
-              border-bottom: 1px solid #334155;
-            "
-          >
-            <h3
-              style="
-                color: #58a6ff;
-                font-size: 14px;
-                font-weight: 600;
-                margin: 0;
-              "
-            >
-              🔴 LIVE - TODAY
-            </h3>
-            <span
-              class="realtime-time"
-              id="p4-realtime-time"
-              style="color: #888; font-size: 11px"
-              >Loading...</span
-            >
-          </div>
-          <div
-            class="realtime-grid"
-            id="p4-realtime-grid"
-            style="
-              display: grid;
-              grid-template-columns: repeat(4, 1fr);
-              gap: 12px;
-            "
-          >
-            <div
-              class="realtime-card"
-              style="
-                background: #1e293b;
-                border-radius: 10px;
-                padding: 10px;
-                text-align: center;
-              "
-            >
-              Loading...
+          <div class="realtime-draws" id="p4-realtime">
+            <div class="realtime-header">
+              <h3>🔴 LIVE - TODAY</h3>
+              <span class="realtime-time" id="p4-realtime-time">Loading...</span>
+            </div>
+            <div class="realtime-grid" id="p4-realtime-grid">
+              <div class="realtime-card">Loading...</div>
             </div>
           </div>
-        </div>
       </div>
     </div>
 
@@ -1019,9 +875,10 @@
     <div id="historyModal-pw" class="history-modal">
       <div class="modal-header">
         <div>
-          <h2>PLAY WHE DRAW CHART ©️ CODEWITHGLASGOW</h2>
+          <h4>PLAY WHE DRAW CHART ©️ CODEWITHGLASGOW</h4>
           <p id="modalDateRange-pw">Loading...</p>
         </div>
+        <h6>🌐 bit.ly/CWGCharts</h6>
         <div class="modal-controls">
           <button
             onclick="downloadHistoryTable('pw')"
@@ -1083,9 +940,10 @@
     <div id="historyModal-p2" class="history-modal">
       <div class="modal-header">
         <div>
-          <h2>PICK 2 DRAW CHART ©️ CODEWITHGLASGOW</h2>
+          <h4>PICK 2 DRAW CHART ©️ CODEWITHGLASGOW</h4>
           <p id="modalDateRange-p2">Loading...</p>
         </div>
+        <h6>🌐 bit.ly/CWGCharts</h6>
         <div class="modal-controls">
           <button
             onclick="downloadHistoryTable('p2')"
@@ -1147,9 +1005,10 @@
     <div id="historyModal-p4" class="history-modal">
       <div class="modal-header">
         <div>
-          <h2>PICK 4 DRAW CHART ©️ CODEWITHGLASGOW</h2>
+          <h4>PICK 4 DRAW CHART ©️ CODEWITHGLASGOW</h4>
           <p id="modalDateRange-p4">Loading...</p>
         </div>
+        <h6>🌐 bit.ly/CWGCharts</h6>
         <div class="modal-controls">
           <button
             onclick="downloadHistoryTable('p4')"
@@ -1540,8 +1399,9 @@
         const tableClone = exportTable.cloneNode(true);
         tableClone.style.width = "100%";
         tableClone.style.borderCollapse = "collapse";
-        tableClone.style.fontSize = "12px";
-        tableClone.style.fontFamily = "Arial, sans-serif";
+        tableClone.style.fontSize = "10px";
+        tableClone.style.fontFamily = "'Helvetica Neue', Arial, sans-serif";
+        tableClone.style.lineHeight = "18px";
 
         // Add branding header
         const header = document.createElement("div");
