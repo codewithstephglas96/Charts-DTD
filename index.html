@@ -795,15 +795,15 @@
         <div class="game-container" id="pw-container">Loading...</div>
 
         <!-- Real-time draws for Play Whe -->
-          <div class="realtime-draws" id="pw-realtime">
-            <div class="realtime-header">
-              <h3>🔴 LIVE - TODAY</h3>
-              <span class="realtime-time" id="pw-realtime-time">Loading...</span>
-            </div>
-            <div class="realtime-grid" id="pw-realtime-grid">
-              <div class="realtime-card">Loading...</div>
-            </div>
+        <div class="realtime-draws" id="pw-realtime">
+          <div class="realtime-header">
+            <h3>🔴 LIVE - TODAY</h3>
+            <span class="realtime-time" id="pw-realtime-time">Loading...</span>
           </div>
+          <div class="realtime-grid" id="pw-realtime-grid">
+            <div class="realtime-card">Loading...</div>
+          </div>
+        </div>
       </div>
 
       <!-- Pick 2 Card -->
@@ -822,15 +822,15 @@
         <div class="game-container" id="p2-container">Loading...</div>
 
         <!-- Real-time draws for Pick 2 -->
-          <div class="realtime-draws" id="p2-realtime">
-            <div class="realtime-header">
-              <h3>🔴 LIVE - TODAY</h3>
-              <span class="realtime-time" id="p2-realtime-time">Loading...</span>
-            </div>
-            <div class="realtime-grid" id="p2-realtime-grid">
-              <div class="realtime-card">Loading...</div>
-            </div>
+        <div class="realtime-draws" id="p2-realtime">
+          <div class="realtime-header">
+            <h3>🔴 LIVE - TODAY</h3>
+            <span class="realtime-time" id="p2-realtime-time">Loading...</span>
           </div>
+          <div class="realtime-grid" id="p2-realtime-grid">
+            <div class="realtime-card">Loading...</div>
+          </div>
+        </div>
       </div>
 
       <!-- Pick 4 Card -->
@@ -849,15 +849,15 @@
         <div class="game-container" id="p4-container">Loading...</div>
 
         <!-- Real-time draws for Pick 4 -->
-          <div class="realtime-draws" id="p4-realtime">
-            <div class="realtime-header">
-              <h3>🔴 LIVE - TODAY</h3>
-              <span class="realtime-time" id="p4-realtime-time">Loading...</span>
-            </div>
-            <div class="realtime-grid" id="p4-realtime-grid">
-              <div class="realtime-card">Loading...</div>
-            </div>
+        <div class="realtime-draws" id="p4-realtime">
+          <div class="realtime-header">
+            <h3>🔴 LIVE - TODAY</h3>
+            <span class="realtime-time" id="p4-realtime-time">Loading...</span>
           </div>
+          <div class="realtime-grid" id="p4-realtime-grid">
+            <div class="realtime-card">Loading...</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1784,6 +1784,7 @@
       document.addEventListener("DOMContentLoaded", async () => {
         await loadAllGames();
         await updateRealtimeDraws();
+        startAutoRefresh();
 
         // Also update real-time draws every 30 seconds (faster than main data)
         setInterval(updateRealtimeDraws, 30000);
@@ -2127,6 +2128,51 @@
           9: [9, 18, 27, 36],
         };
 
+        // Count frequency of each number (how many times it appears)
+        const frequencyMap = {};
+        currentWeekDraws.forEach((num) => {
+          frequencyMap[num] = (frequencyMap[num] || 0) + 1;
+        });
+
+        // Get background color based on frequency count
+        const getNumberBgColor = (num) => {
+          const count = frequencyMap[num] || 0;
+          if (count >= 4) return "#ff4444";
+          if (count === 3) return "#ffd700";
+          if (count === 2) return "#00ff00";
+          if (count === 1) return "#00ffff";
+          return null; // No background for unplayed
+        };
+
+        const getTextColor = (bgColor) => {
+          if (!bgColor) return "#000000";
+          if (
+            bgColor === "#ffd700" ||
+            bgColor === "#00ff00" ||
+            bgColor === "#00ffff"
+          )
+            return "#000000";
+          return "#ffffff";
+        };
+
+        // Calculate Ctr (total occurrences counting duplicates)
+        const getLineCount = (lineNumbersArray) => {
+          let total = 0;
+          lineNumbersArray.forEach((num) => {
+            total += frequencyMap[num] || 0;
+          });
+          return total;
+        };
+
+        // Get Ctr cell color based on total
+        const getCtrColor = (total) => {
+          if (total >= 4) return { bg: "#ff4444", text: "#ffffff" };
+          if (total === 3) return { bg: "#ffd700", text: "#000000" };
+          if (total === 2) return { bg: "#00ff00", text: "#000000" };
+          if (total === 1) return { bg: "#00ffff", text: "#000000" };
+          return { bg: "#ed7d31", text: "#ffffff" };
+        };
+
         let html = `
               <div style="background: white; border: 1px solid #ccc; font-family: Arial, sans-serif;">
                   <div style="background: #d9d9d9; padding: 6px; text-align: center; font-weight: bold; font-size: 13px; border-bottom: 1px solid #ccc;">Lines Played This Week</div>
@@ -2138,20 +2184,21 @@
                       </tr>`;
 
         for (let i = 1; i <= 9; i++) {
-          const hits = lineNumbers[i].filter((n) =>
-            currentWeekDraws.includes(n),
-          );
+          const lineTotal = getLineCount(lineNumbers[i]);
+          const ctrStyle = getCtrColor(lineTotal);
+
           html += `
                   <tr>
                       <td style="border: 1px solid #ddd; padding: 6px; font-weight: bold;">${i}</td>
-                      <td style="border: 1px solid #ddd; padding: 6px; background: #ed7d31; color: white; font-weight: bold;">${hits.length}</td>`;
+                      <td style="border: 1px solid #ddd; padding: 6px; background: ${ctrStyle.bg}; color: ${ctrStyle.text}; font-weight: bold;">${lineTotal}</td>`;
 
           lineNumbers[i].forEach((num) => {
-            const isHit = currentWeekDraws.includes(num);
-            const bg = isHit
-              ? "background: #4472c4; color: white; font-weight: bold;"
+            const bgColor = getNumberBgColor(num);
+            const textColor = getTextColor(bgColor);
+            const style = bgColor
+              ? `background: ${bgColor}; color: ${textColor}; font-weight: bold;`
               : "";
-            html += `<td style="border: 1px solid #ddd; padding: 6px; width: 35px; ${bg}">${num}</td>`;
+            html += `<td style="border: 1px solid #ddd; padding: 6px; width: 35px; ${style}">${num}</td>`;
           });
           html += `</tr>`;
         }
@@ -2174,6 +2221,53 @@
           9: [9, 19, 29],
         };
 
+        // Count frequency of each number (how many times it appears)
+        const frequencyMap = {};
+        currentWeekDraws.forEach((num) => {
+          frequencyMap[num] = (frequencyMap[num] || 0) + 1;
+        });
+
+        // Get background color based on frequency count
+        const getNumberBgColor = (num) => {
+          const count = frequencyMap[num] || 0;
+          if (count >= 4) return "#ff4444";
+          if (count === 3) return "#ffd700";
+          if (count === 2) return "#00ff00";
+          if (count === 1) return "#00ffff";
+          return null; // No background for unplayed
+        };
+
+        const getTextColor = (bgColor) => {
+          if (!bgColor) return "#000000";
+          if (
+            bgColor === "#ffd700" ||
+            bgColor === "#00ff00" ||
+            bgColor === "#00ffff"
+          )
+            return "#000000";
+          return "#ffffff";
+        };
+
+        // Calculate Ctr (total occurrences counting duplicates)
+        const getSuiteCount = (suiteNumbers) => {
+          let total = 0;
+          suiteNumbers.forEach((num) => {
+            if (num !== "") {
+              total += frequencyMap[num] || 0;
+            }
+          });
+          return total;
+        };
+
+        // Get Ctr cell color based on total
+        const getCtrColor = (total) => {
+          if (total >= 4) return { bg: "#ff4444", text: "#ffffff" };
+          if (total === 3) return { bg: "#ffd700", text: "#000000" };
+          if (total === 2) return { bg: "#00ff00", text: "#000000" };
+          if (total === 1) return { bg: "#00ffff", text: "#000000" };
+          return { bg: "#ed7d31", text: "#ffffff" };
+        };
+
         let html = `
               <div style="background: white; border: 1px solid #ccc; font-family: Arial, sans-serif;">
                   <div style="background: #d9d9d9; padding: 6px; text-align: center; font-weight: bold; font-size: 13px; border-bottom: 1px solid #ccc;">Suits Played This Week</div>
@@ -2185,19 +2279,26 @@
                       </tr>`;
 
         for (let i = 0; i <= 9; i++) {
-          const hits = suites[i].filter((n) => currentWeekDraws.includes(n));
+          const suiteTotal = getSuiteCount(suites[i]);
+          const ctrStyle = getCtrColor(suiteTotal);
+
           html += `
                   <tr>
                       <td style="border: 1px solid #ddd; padding: 6px; font-weight: bold;">${i}</td>
-                      <td style="border: 1px solid #ddd; padding: 6px; background: #ed7d31; color: white; font-weight: bold;">${hits.length}</td>`;
+                      <td style="border: 1px solid #ddd; padding: 6px; background: ${ctrStyle.bg}; color: ${ctrStyle.text}; font-weight: bold;">${suiteTotal}</td>`;
 
           for (let j = 0; j < 4; j++) {
             const num = suites[i][j] || "";
-            const isHit = num !== "" && currentWeekDraws.includes(num);
-            const bg = isHit
-              ? "background: #4472c4; color: white; font-weight: bold;"
-              : "";
-            html += `<td style="border: 1px solid #ddd; padding: 6px; width: 35px; ${bg}">${num}</td>`;
+            if (num === "") {
+              html += `<td style="border: 1px solid #ddd; padding: 6px; width: 35px;"></td>`;
+            } else {
+              const bgColor = getNumberBgColor(parseInt(num));
+              const textColor = getTextColor(bgColor);
+              const style = bgColor
+                ? `background: ${bgColor}; color: ${textColor}; font-weight: bold;`
+                : "";
+              html += `<td style="border: 1px solid #ddd; padding: 6px; width: 35px; ${style}">${num}</td>`;
+            }
           }
           html += `</tr>`;
         }
@@ -3169,29 +3270,6 @@
           ? "☀️ Light"
           : "🌓 Dark";
       }
-
-      // ========== INITIALIZATION ==========
-      document.addEventListener("DOMContentLoaded", async () => {
-        await loadAllGames();
-
-        // Add click handlers for headers
-        document
-          .querySelector("#playwhe-card .game-header")
-          .addEventListener("click", () => openHistoryModal("pw"));
-        document
-          .querySelector("#pick2-card .game-header")
-          .addEventListener("click", () => openHistoryModal("p2"));
-        document
-          .querySelector("#pick4-card .game-header")
-          .addEventListener("click", () => openHistoryModal("p4"));
-
-        // Close modal when clicking outside
-        window.addEventListener("click", (event) => {
-          if (event.target.classList.contains("history-modal")) {
-            event.target.style.display = "none";
-          }
-        });
-      });
     </script>
   </body>
 </html>
