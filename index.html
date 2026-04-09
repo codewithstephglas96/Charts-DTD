@@ -678,6 +678,244 @@
         gap: 12px;
       }
 
+      .realtime-preview {
+        margin-top: 14px;
+        padding: 12px;
+        background: #111827;
+        border-radius: 12px;
+        border: 1px solid #334155;
+      }
+
+      .realtime-preview-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+
+      .realtime-preview-header span {
+        color: #cbd5e1;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .realtime-preview-content {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        color: #e2e8f0;
+        font-size: 13px;
+      }
+
+      .realtime-preview-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 999px;
+        padding: 6px 10px;
+      }
+
+      .realtime-copy-btn {
+        background: #2563eb;
+        border: none;
+        color: white;
+        border-radius: 999px;
+        padding: 6px 10px;
+        cursor: pointer;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .realtime-copy-btn:hover {
+        background: #1d4ed8;
+      }
+
+      .realtime-analyzer {
+        margin-top: 14px;
+        padding: 12px;
+        background: #111827;
+        border: 1px solid #334155;
+        border-radius: 12px;
+      }
+
+      .realtime-analyzer-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .realtime-analyzer-header span {
+        color: #cbd5e1;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .realtime-analyzer-filters {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .analyzer-select {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid #334155;
+        background: #0f172a;
+        color: #e2e8f0;
+        font-size: 12px;
+      }
+
+      .realtime-clear-btn {
+        width: 100%;
+        padding: 10px 12px;
+        border: none;
+        border-radius: 999px;
+        background: #334155;
+        color: #e2e8f0;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+
+      .realtime-clear-btn:hover {
+        background: #475569;
+      }
+
+      .realtime-rank-btn {
+        border: none;
+        border-radius: 999px;
+        background: #10b981;
+        color: white;
+        font-weight: 700;
+        font-size: 12px;
+        padding: 10px 14px;
+        cursor: pointer;
+      }
+
+      .realtime-rank-btn:hover {
+        background: #0f766e;
+      }
+
+      .analyzer-unlock {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        align-items: center;
+        justify-content: center;
+        padding: 24px 16px;
+        text-align: center;
+      }
+
+      .analyzer-unlock-text {
+        color: #cbd5e1;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .analyzer-unlock-form {
+        display: flex;
+        gap: 8px;
+        width: 100%;
+        max-width: 280px;
+      }
+
+      .analyzer-unlock-input {
+        flex: 1;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid #334155;
+        background: #0f172a;
+        color: #e2e8f0;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .analyzer-unlock-input::placeholder {
+        color: #718096;
+      }
+
+      .analyzer-unlock-btn {
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: none;
+        background: #10b981;
+        color: white;
+        font-weight: 700;
+        font-size: 11px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+
+      .analyzer-unlock-btn:hover {
+        background: #0f766e;
+      }
+
+      .analyzer-content {
+        display: none;
+      }
+
+      .analyzer-content.unlocked {
+        display: block;
+      }
+
+      .analyzer-results {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .res-card {
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 12px;
+      }
+
+      .analyzer-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        font-size: 12px;
+      }
+
+      .analyzer-table th,
+      .analyzer-table td {
+        border: 1px solid #1f2937;
+        padding: 8px;
+        text-align: left;
+        color: #e2e8f0;
+      }
+
+      .analyzer-table th {
+        color: #94a3b8;
+      }
+
+      @media (max-width: 768px) {
+        .realtime-analyzer-filters {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 8px;
+        }
+        .analyzer-select,
+        .realtime-clear-btn {
+          font-size: 11px;
+          padding: 8px 10px;
+        }
+        .realtime-preview-chip {
+          font-size: 11px;
+          padding: 4px 6px;
+        }
+      }
+
       .realtime-card {
         background: #1e293b;
         border-radius: 10px;
@@ -803,6 +1041,90 @@
           <div class="realtime-grid" id="pw-realtime-grid">
             <div class="realtime-card">Loading...</div>
           </div>
+          <div class="realtime-preview" id="pw-realtime-preview">
+            <div class="realtime-preview-header">
+              <span>Previous week preview</span>
+              <button
+                type="button"
+                class="realtime-copy-btn"
+                onclick="copyPreviousWeekPreview()"
+              >
+                Copy
+              </button>
+            </div>
+            <div
+              class="realtime-preview-content"
+              id="pw-realtime-preview-content"
+            >
+              Loading preview...
+            </div>
+          </div>
+
+          <div class="realtime-analyzer" id="pw-mark-analyzer">
+            <div class="analyzer-unlock" id="pwAnalyzerUnlock">
+              <div class="analyzer-unlock-text">🔒 Enter Code To Unlock</div>
+              <form class="analyzer-unlock-form" onsubmit="unlockAnalyzer(event, 'pw')">
+                <input
+                  type="text"
+                  class="analyzer-unlock-input"
+                  id="pwUnlockCode"
+                  placeholder="CODE"
+                  maxlength="6"
+                />
+                <button type="submit" class="analyzer-unlock-btn">UNLOCK</button>
+              </form>
+            </div>
+            <div class="analyzer-content" id="pwAnalyzerContent">
+              <div class="realtime-analyzer-header">
+                <span>PLAY WHE MARK ANALYZER</span>
+                <button
+                  class="realtime-rank-btn"
+                  onclick="runPlayWheMarkAnalyzer()"
+                >
+                  RANK MARKS
+                </button>
+            </div>
+            <div class="realtime-analyzer-filters">
+              <select id="pwMarkDay" class="analyzer-select">
+                <option value="ALL">All Days</option>
+                <option value="Sunday">Sunday</option>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+                <option value="Saturday">Saturday</option>
+              </select>
+              <select id="pwMarkTime" class="analyzer-select">
+                <option value="ALL">All Times</option>
+                <option value="MOR">Morning</option>
+                <option value="MID">Midday</option>
+                <option value="NON">Afternoon</option>
+                <option value="EVE">Evening</option>
+              </select>
+              <select id="pwMarkScope" class="analyzer-select">
+                <option value="4">Last 4 Weeks</option>
+                <option value="8" selected>Last 8 Weeks</option>
+                <option value="12">Last 12 Weeks</option>
+                <option value="16">Last 16 Weeks</option>
+                <option value="20">Last 20 Weeks</option>
+                <option value="24">Last 24 Weeks</option>
+              </select>
+              <div>
+                <button
+                  type="button"
+                  class="realtime-clear-btn"
+                  onclick="resetPlayWheAnalyzerFilters()"
+                >
+                  CLEAR
+                </button>
+              </div>
+            </div>
+            <div class="analyzer-results" id="pwMarkAnalyzerResults">
+              Select filters and tap “RANK MARKS”.
+            </div>
+              </div>
+          </div>
         </div>
       </div>
 
@@ -830,8 +1152,90 @@
           <div class="realtime-grid" id="p2-realtime-grid">
             <div class="realtime-card">Loading...</div>
           </div>
-        </div>
+          <div class="realtime-preview" id="p2-realtime-preview">
+            <div class="realtime-preview-header">
+              <span>Previous week preview</span>
+              <button
+                type="button"
+                class="realtime-copy-btn"
+                onclick="copyPreviousWeekPreview('p2')"
+              >
+                Copy
+              </button>
+            </div>
+            <div
+              class="realtime-preview-content"
+              id="p2-realtime-preview-content"
+            >
+              Loading preview...
+            </div>
+          </div>
+
+          <div class="realtime-analyzer" id="p2-mark-analyzer">
+            <div class="analyzer-unlock" id="p2AnalyzerUnlock">
+              <div class="analyzer-unlock-text">🔒 Enter Code To Unlock</div>
+              <form class="analyzer-unlock-form" onsubmit="unlockAnalyzer(event, 'p2')">
+                <input
+                  type="text"
+                  class="analyzer-unlock-input"
+                  id="p2UnlockCode"
+                  placeholder="CODE"
+                  maxlength="6"
+                />
+                <button type="submit" class="analyzer-unlock-btn">UNLOCK</button>
+              </form>
+            </div>
+            <div class="analyzer-content" id="p2AnalyzerContent">
+              <div class="realtime-analyzer-header">
+                <span>PICK 2 ANALYZER</span>
+                <button class="realtime-rank-btn" onclick="runPick2Analyzer()">
+                  RANK PAIRS
+                </button>
+              </div>
+              <div class="realtime-analyzer-filters">
+                <select id="p2AnalyzerDay" class="analyzer-select">
+                  <option value="ALL">All Days</option>
+                  <option value="Sunday">Sunday</option>
+                  <option value="Monday">Monday</option>
+                  <option value="Tuesday">Tuesday</option>
+                  <option value="Wednesday">Wednesday</option>
+                  <option value="Thursday">Thursday</option>
+                  <option value="Friday">Friday</option>
+                  <option value="Saturday">Saturday</option>
+                </select>
+                <select id="p2AnalyzerTime" class="analyzer-select">
+                  <option value="ALL">All Times</option>
+                  <option value="MOR">Morning</option>
+                  <option value="MID">Midday</option>
+                  <option value="NON">Afternoon</option>
+                  <option value="EVE">Evening</option>
+                </select>
+                <select id="p2AnalyzerScope" class="analyzer-select">
+                  <option value="4">Last 4 Weeks</option>
+                  <option value="8" selected>Last 8 Weeks</option>
+                  <option value="12">Last 12 Weeks</option>
+                  <option value="16">Last 16 Weeks</option>
+                  <option value="20">Last 20 Weeks</option>
+                  <option value="24">Last 24 Weeks</option>
+                </select>
+                <div>
+                  <button
+                    type="button"
+                    class="realtime-clear-btn"
+                    onclick="resetPick2AnalyzerFilters()"
+                  >
+                    CLEAR
+                  </button>
+                </div>
+              </div>
+              <div class="analyzer-results" id="p2AnalyzerResults">
+                Select filters and tap "RANK PAIRS".
+              </div>
+            </div>
+          </div>
       </div>
+                      </div>
+                    </div>
 
       <!-- Pick 4 Card -->
       <div class="game-card" id="pick4-card">
@@ -857,6 +1261,24 @@
           <div class="realtime-grid" id="p4-realtime-grid">
             <div class="realtime-card">Loading...</div>
           </div>
+          <div class="realtime-preview" id="p4-realtime-preview">
+            <div class="realtime-preview-header">
+              <span>Previous week preview</span>
+              <button
+                type="button"
+                class="realtime-copy-btn"
+                onclick="copyPreviousWeekPreview('p4')"
+              >
+                Copy
+              </button>
+            </div>
+            <div
+              class="realtime-preview-content"
+              id="p4-realtime-preview-content"
+            >
+              Loading preview...
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -878,7 +1300,7 @@
           <h4>PLAY WHE DRAW CHART ©️ CODEWITHGLASGOW</h4>
           <p id="modalDateRange-pw">Loading...</p>
         </div>
-        <h6>🌐 bit.ly/CWGCharts or bit.ly/ChartsByCWG</h6>
+        <h6>🌐 bit.ly/CWGCharts</h6>
         <div class="modal-controls">
           <button
             onclick="downloadHistoryTable('pw')"
@@ -943,7 +1365,7 @@
           <h4>PICK 2 DRAW CHART ©️ CODEWITHGLASGOW</h4>
           <p id="modalDateRange-p2">Loading...</p>
         </div>
-        <h6>🌐 bit.ly/CWGCharts or bit.ly/ChartsByCWG</h6>
+        <h6>🌐 bit.ly/CWGCharts</h6>
         <div class="modal-controls">
           <button
             onclick="downloadHistoryTable('p2')"
@@ -1008,7 +1430,7 @@
           <h4>PICK 4 DRAW CHART ©️ CODEWITHGLASGOW</h4>
           <p id="modalDateRange-p4">Loading...</p>
         </div>
-        <h6>🌐 bit.ly/CWGCharts or bit.ly/ChartsByCWG</h6>
+        <h6>🌐 bit.ly/CWGCharts</h6>
         <div class="modal-controls">
           <button
             onclick="downloadHistoryTable('p4')"
@@ -1222,6 +1644,153 @@
         36: "#9775fa",
       };
 
+      const playWheMasterData = {
+        1: {
+          name: "CENTIPEDE",
+          spirit: 2,
+          partner: 16,
+          mirror: 36,
+          emoji: "🐛",
+        },
+        2: {
+          name: "OLD LADY",
+          spirit: 24,
+          partner: 17,
+          mirror: 35,
+          emoji: "👵",
+        },
+        3: {
+          name: "CARRIAGE",
+          spirit: 19,
+          partner: 18,
+          mirror: 34,
+          emoji: "🚗",
+        },
+        4: { name: "DEADMAN", spirit: 3, partner: 19, mirror: 33, emoji: "💀" },
+        5: {
+          name: "PARSON MAN",
+          spirit: 1,
+          partner: 20,
+          mirror: 32,
+          emoji: "🧍🏽‍♂️",
+        },
+        6: { name: "BELLY", spirit: 15, partner: 21, mirror: 31, emoji: "🤰" },
+        7: { name: "HOG", spirit: 13, partner: 22, mirror: 30, emoji: "🐗" },
+        8: { name: "TIGER", spirit: 29, partner: 23, mirror: 29, emoji: "🐅" },
+        9: { name: "CATTLE", spirit: 33, partner: 24, mirror: 28, emoji: "🐄" },
+        10: {
+          name: "MONKEY",
+          spirit: 28,
+          partner: 25,
+          mirror: 27,
+          emoji: "🐒",
+        },
+        11: {
+          name: "CORBEAU",
+          spirit: 11,
+          partner: 26,
+          mirror: 26,
+          emoji: "🐦‍🔥",
+        },
+        12: { name: "KING", spirit: 32, partner: 27, mirror: 25, emoji: "👑" },
+        13: {
+          name: "CRAPAUD",
+          spirit: 7,
+          partner: 28,
+          mirror: 24,
+          emoji: "🐸",
+        },
+        14: { name: "MONEY", spirit: 25, partner: 29, mirror: 23, emoji: "💰" },
+        15: {
+          name: "SICK WOMAN",
+          spirit: 9,
+          partner: 30,
+          mirror: 22,
+          emoji: "🤧",
+        },
+        16: {
+          name: "JAMETTE",
+          spirit: 17,
+          partner: 31,
+          mirror: 21,
+          emoji: "💃",
+        },
+        17: {
+          name: "PIGEON",
+          spirit: 18,
+          partner: 32,
+          mirror: 20,
+          emoji: "🦜",
+        },
+        18: {
+          name: "WATER BOAT",
+          spirit: 30,
+          partner: 33,
+          mirror: 19,
+          emoji: "🚤",
+        },
+        19: { name: "HORSE", spirit: 5, partner: 34, mirror: 18, emoji: "🐎" },
+        20: { name: "DOG", spirit: 22, partner: 35, mirror: 17, emoji: "🐕" },
+        21: { name: "MOUTH", spirit: 23, partner: 36, mirror: 16, emoji: "👄" },
+        22: { name: "RAT", spirit: 20, partner: 1, mirror: 15, emoji: "🐀" },
+        23: { name: "HOUSE", spirit: 21, partner: 2, mirror: 14, emoji: "🏠" },
+        24: { name: "QUEEN", spirit: 2, partner: 3, mirror: 13, emoji: "👑" },
+        25: {
+          name: "MOROCOY",
+          spirit: 14,
+          partner: 4,
+          mirror: 12,
+          emoji: "🐢",
+        },
+        26: { name: "FOWL", spirit: 27, partner: 5, mirror: 11, emoji: "🐓" },
+        27: {
+          name: "LITTLE SNAKE",
+          spirit: 16,
+          partner: 6,
+          mirror: 10,
+          emoji: "🐍",
+        },
+        28: { name: "FISH", spirit: 10, partner: 7, mirror: 9, emoji: "🐟" },
+        29: {
+          name: "OPIUM MAN",
+          spirit: 4,
+          partner: 8,
+          mirror: 8,
+          emoji: "🥴",
+        },
+        30: {
+          name: "HOUSE CAT",
+          spirit: 12,
+          partner: 9,
+          mirror: 7,
+          emoji: "🐈",
+        },
+        31: {
+          name: "PARSON WIFE",
+          spirit: 34,
+          partner: 10,
+          mirror: 6,
+          emoji: "👰",
+        },
+        32: { name: "SHRIMPS", spirit: 8, partner: 11, mirror: 5, emoji: "🦐" },
+        33: { name: "SPIDER", spirit: 26, partner: 12, mirror: 4, emoji: "🕷️" },
+        34: {
+          name: "BLIND MAN",
+          spirit: 31,
+          partner: 13,
+          mirror: 3,
+          emoji: "👨‍🦯",
+        },
+        35: {
+          name: "BIG SNAKE",
+          spirit: 4,
+          partner: 14,
+          mirror: 2,
+          emoji: "🐍",
+        },
+        36: { name: "DONKEY", spirit: 11, partner: 15, mirror: 1, emoji: "🫏" },
+      };
+
       // Mark colors for Play Whe
       const markColors = {
         WB: { bg: "#ffffff", txt: "#000000" },
@@ -1240,6 +1809,9 @@
         pick2: { weeks: [], fullWeeks: [], currentDay: todayName },
         pick4: { weeks: [], fullWeeks: [], currentDay: todayName },
       };
+
+      let playWheTimeline = [];
+      let pick2Timeline = [];
 
       // ========== HELPER FUNCTIONS ==========
       function getSortKey(val) {
@@ -1733,6 +2305,7 @@
           gameState.pick2.weeks = gameState.pick2.fullWeeks.slice(0, 8);
           gameState.pick4.weeks = gameState.pick4.fullWeeks.slice(0, 8);
 
+          buildAnalyzerTimelines();
           await renderGameUI("pw");
           await renderGameUI("p2");
           await renderGameUI("p4");
@@ -1974,6 +2547,777 @@
         });
 
         gridElement.innerHTML = html;
+
+        if (prefix === "pw") {
+          renderPlayWhePreviousWeekPreview();
+        } else if (prefix === "p2") {
+          renderPick2PreviousWeekPreview();
+        } else if (prefix === "p4") {
+          renderPick4PreviousWeekPreview();
+        }
+      }
+
+      function renderPlayWhePreviousWeekPreview() {
+        const previewContainer = document.getElementById("pw-realtime-preview");
+        const previewContent = document.getElementById(
+          "pw-realtime-preview-content",
+        );
+        if (!previewContainer || !previewContent) return;
+
+        const fullWeeks = gameState.playwhe.fullWeeks || [];
+        if (fullWeeks.length < 2) {
+          previewContent.textContent = "Previous week preview unavailable";
+          previewContainer.dataset.copyText = "";
+          return;
+        }
+
+        const now = new Date();
+        const showNextDay =
+          now.getHours() > 18 ||
+          (now.getHours() === 18 && now.getMinutes() >= 50);
+        const previewDayIndex = showNextDay
+          ? (now.getDay() + 1) % 7
+          : now.getDay();
+        const previewDayName = dayNames[previewDayIndex];
+
+        const weeks = [...fullWeeks].reverse();
+        const currentWeekIndex = weeks.length - 1;
+        let previousWeekIndex = currentWeekIndex - 1;
+
+        const isHolidayDay = (day) => {
+          if (!day) return false;
+          return ["MOR", "MID", "NON", "EVE"].some((slot) => {
+            const val = day.draws[slot];
+            return (
+              typeof val === "string" &&
+              val.trim().toUpperCase().includes("HOLIDAY")
+            );
+          });
+        };
+
+        while (previousWeekIndex >= 0) {
+          const candidateWeek = weeks[previousWeekIndex];
+          const dayData = candidateWeek.days.find(
+            (d) => d.dayName === previewDayName,
+          );
+          if (!dayData) {
+            previousWeekIndex -= 1;
+            continue;
+          }
+
+          if (!isHolidayDay(dayData)) break;
+          previousWeekIndex -= 1;
+        }
+
+        const previousWeek =
+          previousWeekIndex >= 0 ? weeks[previousWeekIndex] : null;
+        if (!previousWeek) {
+          previewContent.textContent =
+            "No previous week draws found for this day.";
+          previewContainer.dataset.copyText = "";
+          return;
+        }
+
+        const dayData = previousWeek.days.find(
+          (d) => d.dayName === previewDayName,
+        );
+        if (!dayData) {
+          previewContent.textContent =
+            "No previous week draws found for this day.";
+          previewContainer.dataset.copyText = "";
+          return;
+        }
+
+        const previewDateObj = getDateForWeekDay(previousWeek, previewDayName);
+        const previewLabel = previewDateObj
+          ? formatShortDate(previewDateObj)
+          : `${previewDayName.slice(0, 3)}`;
+        const titleText = showNextDay
+          ? `What We're Coming Under Tomorrow (${previewLabel})`
+          : `What We're Coming Under Today (${previewLabel})`;
+
+        const headerSpan = previewContainer.querySelector(
+          ".realtime-preview-header span",
+        );
+        if (headerSpan) {
+          headerSpan.textContent = titleText;
+        }
+
+        const slotsOrder = ["MOR", "MID", "NON", "EVE"];
+
+        const previewValues = slotsOrder.map((slot) => {
+          const draw = dayData.draws[slot];
+          if (!draw || draw === "-" || draw === "PENDING") {
+            return {
+              display: "—",
+              text: "—",
+            };
+          }
+          const match = draw
+            .toString()
+            .trim()
+            .match(/^(\d{1,2})/);
+          const numText = match ? match[1].padStart(2, "0") : draw;
+          const emoji = playWheMasterData[parseInt(numText, 10)]?.emoji || "";
+          return {
+            display: `${numText}${emoji}`,
+            text: `${numText}${emoji}`,
+          };
+        });
+
+        previewContent.innerHTML = [
+          `<span class="realtime-preview-chip realtime-preview-label">${previewLabel}</span>`,
+          ...previewValues.map(
+            (item) =>
+              `<span class="realtime-preview-chip">${item.display}</span>`,
+          ),
+        ].join("");
+
+        const copyText = `${previewLabel} : ${previewValues
+          .map((item) => item.text)
+          .join(" | ")}`;
+        previewContainer.dataset.copyText = copyText;
+      }
+
+      function renderPick2PreviousWeekPreview() {
+        const previewContainer = document.getElementById("p2-realtime-preview");
+        const previewContent = document.getElementById(
+          "p2-realtime-preview-content",
+        );
+        if (!previewContainer || !previewContent) return;
+
+        const fullWeeks = gameState.pick2.fullWeeks || [];
+        if (fullWeeks.length < 2) {
+          previewContent.textContent = "Previous week preview unavailable";
+          previewContainer.dataset.copyText = "";
+          return;
+        }
+
+        const now = new Date();
+        const showNextDay =
+          now.getHours() > 18 ||
+          (now.getHours() === 18 && now.getMinutes() >= 50);
+        const previewDayIndex = showNextDay
+          ? (now.getDay() + 1) % 7
+          : now.getDay();
+        const previewDayName = dayNames[previewDayIndex];
+
+        const weeks = [...fullWeeks].reverse();
+        const currentWeekIndex = weeks.length - 1;
+        let previousWeekIndex = currentWeekIndex - 1;
+
+        const isHolidayDay = (day) => {
+          if (!day) return false;
+          return ["MOR", "MID", "NON", "EVE"].some((slot) => {
+            const val = day.draws[slot];
+            return (
+              typeof val === "string" &&
+              val.trim().toUpperCase().includes("HOLIDAY")
+            );
+          });
+        };
+
+        while (previousWeekIndex >= 0) {
+          const candidateWeek = weeks[previousWeekIndex];
+          const dayData = candidateWeek.days.find(
+            (d) => d.dayName === previewDayName,
+          );
+          if (!dayData) {
+            previousWeekIndex -= 1;
+            continue;
+          }
+
+          if (!isHolidayDay(dayData)) break;
+          previousWeekIndex -= 1;
+        }
+
+        const previousWeek =
+          previousWeekIndex >= 0 ? weeks[previousWeekIndex] : null;
+        if (!previousWeek) {
+          previewContent.textContent =
+            "No previous week draws found for this day.";
+          previewContainer.dataset.copyText = "";
+          return;
+        }
+
+        const dayData = previousWeek.days.find(
+          (d) => d.dayName === previewDayName,
+        );
+        if (!dayData) {
+          previewContent.textContent =
+            "No previous week draws found for this day.";
+          previewContainer.dataset.copyText = "";
+          return;
+        }
+
+        const previewDateObj = getDateForWeekDay(previousWeek, previewDayName);
+        const previewLabel = previewDateObj
+          ? formatShortDate(previewDateObj)
+          : `${previewDayName.slice(0, 3)}`;
+        const titleText = showNextDay
+          ? `What We're Coming Under Tomorrow (${previewLabel})`
+          : `What We're Coming Under Today (${previewLabel})`;
+
+        const headerSpan = previewContainer.querySelector(
+          ".realtime-preview-header span",
+        );
+        if (headerSpan) {
+          headerSpan.textContent = titleText;
+        }
+
+        const slotsOrder = ["MOR", "MID", "NON", "EVE"];
+
+        const previewValues = slotsOrder.map((slot) => {
+          const draw = dayData.draws[slot];
+          if (!draw || draw === "-" || draw === "PENDING") {
+            return {
+              display: "—",
+              text: "—",
+            };
+          }
+          const nums = String(draw).match(/\d{1,2}/g);
+          if (!nums || nums.length < 2) {
+            return {
+              display: draw,
+              text: draw,
+            };
+          }
+          const pair = nums.slice(0, 2).join("/");
+          return {
+            display: pair,
+            text: pair,
+          };
+        });
+
+        previewContent.innerHTML = [
+          `<span class="realtime-preview-chip realtime-preview-label">${previewLabel}</span>`,
+          ...previewValues.map(
+            (item) =>
+              `<span class="realtime-preview-chip">${item.display}</span>`,
+          ),
+        ].join("");
+
+        const copyText = `${previewLabel} : ${previewValues
+          .map((item) => item.text)
+          .join(" | ")}`;
+        previewContainer.dataset.copyText = copyText;
+      }
+
+      function renderPick4PreviousWeekPreview() {
+        const previewContainer = document.getElementById("p4-realtime-preview");
+        const previewContent = document.getElementById(
+          "p4-realtime-preview-content",
+        );
+        if (!previewContainer || !previewContent) return;
+
+        const fullWeeks = gameState.pick4.fullWeeks || [];
+        if (fullWeeks.length < 2) {
+          previewContent.textContent = "Previous week preview unavailable";
+          previewContainer.dataset.copyText = "";
+          return;
+        }
+
+        const now = new Date();
+        const showNextDay =
+          now.getHours() > 18 ||
+          (now.getHours() === 18 && now.getMinutes() >= 50);
+        const previewDayIndex = showNextDay
+          ? (now.getDay() + 1) % 7
+          : now.getDay();
+        const previewDayName = dayNames[previewDayIndex];
+
+        const weeks = [...fullWeeks].reverse();
+        const currentWeekIndex = weeks.length - 1;
+        let previousWeekIndex = currentWeekIndex - 1;
+
+        const isHolidayDay = (day) => {
+          if (!day) return false;
+          return ["MOR", "MID", "NON", "EVE"].some((slot) => {
+            const val = day.draws[slot];
+            return (
+              typeof val === "string" &&
+              val.trim().toUpperCase().includes("HOLIDAY")
+            );
+          });
+        };
+
+        while (previousWeekIndex >= 0) {
+          const candidateWeek = weeks[previousWeekIndex];
+          const dayData = candidateWeek.days.find(
+            (d) => d.dayName === previewDayName,
+          );
+          if (!dayData) {
+            previousWeekIndex -= 1;
+            continue;
+          }
+
+          if (!isHolidayDay(dayData)) break;
+          previousWeekIndex -= 1;
+        }
+
+        const previousWeek =
+          previousWeekIndex >= 0 ? weeks[previousWeekIndex] : null;
+        if (!previousWeek) {
+          previewContent.textContent =
+            "No previous week draws found for this day.";
+          previewContainer.dataset.copyText = "";
+          return;
+        }
+
+        const dayData = previousWeek.days.find(
+          (d) => d.dayName === previewDayName,
+        );
+        if (!dayData) {
+          previewContent.textContent =
+            "No previous week draws found for this day.";
+          previewContainer.dataset.copyText = "";
+          return;
+        }
+
+        const previewDateObj = getDateForWeekDay(previousWeek, previewDayName);
+        const previewLabel = previewDateObj
+          ? formatShortDate(previewDateObj)
+          : `${previewDayName.slice(0, 3)}`;
+        const titleText = showNextDay
+          ? `What We're Coming Under Tomorrow (${previewLabel})`
+          : `What We're Coming Under Today (${previewLabel})`;
+
+        const headerSpan = previewContainer.querySelector(
+          ".realtime-preview-header span",
+        );
+        if (headerSpan) {
+          headerSpan.textContent = titleText;
+        }
+
+        const slotsOrder = ["MOR", "MID", "NON", "EVE"];
+
+        const previewValues = slotsOrder.map((slot) => {
+          const draw = dayData.draws[slot];
+          if (!draw || draw === "-" || draw === "PENDING") {
+            return {
+              display: "—",
+              text: "—",
+            };
+          }
+          const p4Number = draw.trim();
+          return {
+            display: p4Number,
+            text: p4Number,
+          };
+        });
+
+        previewContent.innerHTML = [
+          `<span class="realtime-preview-chip realtime-preview-label">${previewLabel}</span>`,
+          ...previewValues.map(
+            (item) =>
+              `<span class="realtime-preview-chip">${item.display}</span>`,
+          ),
+        ].join("");
+
+        const copyText = `${previewLabel} : ${previewValues
+          .map((item) => item.text)
+          .join(" | ")}`;
+        previewContainer.dataset.copyText = copyText;
+      }
+
+      function getDateForWeekDay(week, dayName) {
+        if (!week || !week.startDate) return null;
+        const parts = week.startDate.split(" ");
+        if (parts.length < 3) return null;
+        const day = parseInt(parts[0], 10);
+        const month = parts[1];
+        const year = parseInt(parts[2], 10);
+        const monthMap = {
+          Jan: 0,
+          Feb: 1,
+          Mar: 2,
+          Apr: 3,
+          May: 4,
+          Jun: 5,
+          Jul: 6,
+          Aug: 7,
+          Sep: 8,
+          Oct: 9,
+          Nov: 10,
+          Dec: 11,
+        };
+        const startOfWeek = new Date(year, monthMap[month], day);
+        const dayIndex = dayNames.indexOf(dayName);
+        if (dayIndex === -1) return null;
+        const date = new Date(startOfWeek);
+        date.setDate(startOfWeek.getDate() + dayIndex);
+        return date;
+      }
+
+      function formatShortDate(date) {
+        if (!date || !(date instanceof Date)) return "";
+        const monthNames = [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ];
+        const dayNamesShort = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        return `${dayNamesShort[date.getDay()]} ${String(
+          date.getDate(),
+        ).padStart(2, "0")} ${monthNames[date.getMonth()]}`;
+      }
+
+      function buildAnalyzerTimelines() {
+        const dayOrder = dayNames;
+        const timeOrder = ["MOR", "MID", "NON", "EVE"];
+        const timeNames = {
+          MOR: "Morning",
+          MID: "Midday",
+          NON: "Afternoon",
+          EVE: "Evening",
+        };
+        const monthMap = {
+          Jan: 0,
+          Feb: 1,
+          Mar: 2,
+          Apr: 3,
+          May: 4,
+          Jun: 5,
+          Jul: 6,
+          Aug: 7,
+          Sep: 8,
+          Oct: 9,
+          Nov: 10,
+          Dec: 11,
+        };
+
+        playWheTimeline = [];
+        pick2Timeline = [];
+
+        const pwWeeks = [...(gameState.playwhe.fullWeeks || [])].reverse();
+        pwWeeks.forEach((week) => {
+          const parts = week.startDate.split(" ");
+          const startDate = new Date(parts[2], monthMap[parts[1]], parts[0]);
+
+          week.days.forEach((day) => {
+            const drawDate = new Date(startDate);
+            drawDate.setDate(
+              drawDate.getDate() + dayOrder.indexOf(day.dayName),
+            );
+
+            timeOrder.forEach((slot) => {
+              const draw = day.draws[slot];
+              if (!draw || draw === "-" || draw === "PENDING") return;
+
+              const num = parseInt(draw, 10);
+              if (isNaN(num) || num < 1 || num > 36) return;
+
+              playWheTimeline.push({
+                num,
+                date: drawDate.getTime(),
+                dateStr: drawDate
+                  .toLocaleDateString("en-GB", {
+                    weekday: "short",
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })
+                  .toUpperCase(),
+                dayName: day.dayName,
+                timeSlot: slot,
+                time: timeNames[slot],
+                isCurrentWeek: week.isCurrentWeek === true,
+              });
+            });
+          });
+        });
+
+        const p2Weeks = [...(gameState.pick2.fullWeeks || [])].reverse();
+        p2Weeks.forEach((week) => {
+          const parts = week.startDate.split(" ");
+          const startDate = new Date(parts[2], monthMap[parts[1]], parts[0]);
+
+          week.days.forEach((day) => {
+            const drawDate = new Date(startDate);
+            drawDate.setDate(
+              drawDate.getDate() + dayOrder.indexOf(day.dayName),
+            );
+
+            timeOrder.forEach((slot) => {
+              const draw = day.draws[slot];
+              if (!draw || draw === "-" || draw === "PENDING") return;
+
+              const nums = String(draw).match(/\d{1,2}/g);
+              if (!nums || nums.length < 2) return;
+
+              const pair = nums
+                .slice(0, 2)
+                .map((n) => n.padStart(2, "0"))
+                .join(",");
+
+              pick2Timeline.push({
+                pair,
+                raw: draw,
+                date: drawDate.getTime(),
+                dateStr: drawDate
+                  .toLocaleDateString("en-GB", {
+                    weekday: "short",
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })
+                  .toUpperCase(),
+                dayName: day.dayName,
+                timeSlot: slot,
+                time: timeNames[slot],
+                isCurrentWeek: week.isCurrentWeek === true,
+              });
+            });
+          });
+        });
+      }
+
+      function formatAgeFromTimestamp(ts) {
+        const daysAgo = Math.floor((Date.now() - ts) / 86400000);
+        return daysAgo <= 0 ? "Today" : `${daysAgo}d`;
+      }
+
+      function runPlayWheMarkAnalyzer() {
+        const day = document.getElementById("pwMarkDay").value;
+        const time = document.getElementById("pwMarkTime").value;
+        const scope = parseInt(
+          document.getElementById("pwMarkScope").value,
+          10,
+        );
+        const resultsDiv = document.getElementById("pwMarkAnalyzerResults");
+
+        if (!playWheTimeline.length) {
+          resultsDiv.innerHTML =
+            '<div style="text-align:center; color:#ff6b6b;">No Play Whe history available.</div>';
+          return;
+        }
+
+        const drawScope = scope * 28;
+        const targeted = playWheTimeline.slice(-drawScope);
+        const counts = {};
+        const logs = {};
+
+        targeted.forEach((entry) => {
+          if (day !== "ALL" && entry.dayName !== day) return;
+          if (time !== "ALL" && entry.timeSlot !== time) return;
+
+          counts[entry.num] = (counts[entry.num] || 0) + 1;
+          if (!logs[entry.num]) logs[entry.num] = [];
+          logs[entry.num].push(entry);
+        });
+
+        const sorted = Object.entries(counts)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 15);
+
+        if (!sorted.length) {
+          resultsDiv.innerHTML =
+            '<div style="text-align:center; color:#ff6b6b;">No matching Play Whe draws found for the selected filters.</div>';
+          return;
+        }
+
+        resultsDiv.innerHTML = sorted
+          .map(([num, count], index) => {
+            const historyRows = (logs[num] || [])
+              .slice()
+              .reverse()
+              .slice(0, 10)
+              .map(
+                (entry) =>
+                  `<tr><td>${entry.dateStr}</td><td>${entry.time}</td><td>${formatAgeFromTimestamp(entry.date)}</td></tr>`,
+              )
+              .join("");
+
+            const spirit =
+              playWheMasterData[parseInt(num, 10)]?.name || "Unknown";
+            return `<div class="res-card">
+                  <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+                    <div>
+                      <div style="font-weight:900; font-size:18px; color:#fff;">#${index + 1} • ${num}</div>
+                      <div style="font-size:12px; color:#94a3b8; margin-top:4px;">${spirit}</div>
+                    </div>
+                    <div style="text-align:right; color:#10b981; font-weight:700; font-size:18px;">${count}x</div>
+                  </div>
+                  <table class="analyzer-table">
+                    <thead><tr><th>DATE</th><th>TIME</th><th>DAYS</th></tr></thead>
+                    <tbody>${historyRows}</tbody>
+                  </table>
+                </div>`;
+          })
+          .join("");
+      }
+
+      function runPick2Analyzer() {
+        const day = document.getElementById("p2AnalyzerDay").value;
+        const time = document.getElementById("p2AnalyzerTime").value;
+        const scope = parseInt(
+          document.getElementById("p2AnalyzerScope").value,
+          10,
+        );
+        const resultsDiv = document.getElementById("p2AnalyzerResults");
+
+        if (!pick2Timeline.length) {
+          resultsDiv.innerHTML =
+            '<div style="text-align:center; color:#ff6b6b;">No Pick 2 history available.</div>';
+          return;
+        }
+
+        const drawScope = scope * 28;
+        const targeted = pick2Timeline.slice(-drawScope);
+        const counts = {};
+        const logs = {};
+
+        targeted.forEach((entry) => {
+          if (day !== "ALL" && entry.dayName !== day) return;
+          if (time !== "ALL" && entry.timeSlot !== time) return;
+
+          counts[entry.pair] = (counts[entry.pair] || 0) + 1;
+          if (!logs[entry.pair]) logs[entry.pair] = [];
+          logs[entry.pair].push(entry);
+        });
+
+        const sorted = Object.entries(counts)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 30);
+
+        if (!sorted.length) {
+          resultsDiv.innerHTML =
+            '<div style="text-align:center; color:#ff6b6b;">No matching Pick 2 pairs found for the selected filters.</div>';
+          return;
+        }
+
+        resultsDiv.innerHTML = sorted
+          .map(([pair, count], index) => {
+            const historyRows = (logs[pair] || [])
+              .slice()
+              .reverse()
+              .slice(0, 10)
+              .map(
+                (entry) =>
+                  `<tr><td>${entry.dayName.slice(0, 3)}</td><td>${entry.time}</td><td>${entry.dateStr}</td><td>${formatAgeFromTimestamp(entry.date)}</td></tr>`,
+              )
+              .join("");
+
+            return `<div class="res-card">
+                  <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+                    <div>
+                      <div style="font-weight:900; font-size:18px; color:#fff;">#${index + 1} • ${pair}</div>
+                    </div>
+                    <div style="text-align:right; color:#10b981; font-weight:700; font-size:18px;">${count}x</div>
+                  </div>
+                  <table class="analyzer-table">
+                    <thead><tr><th>DAY</th><th>TIME</th><th>DATE</th><th>DAYS</th></tr></thead>
+                    <tbody>${historyRows}</tbody>
+                  </table>
+                </div>`;
+          })
+          .join("");
+      }
+
+      function resetPlayWheAnalyzerFilters() {
+        document.getElementById("pwMarkDay").value = "ALL";
+        document.getElementById("pwMarkTime").value = "ALL";
+        document.getElementById("pwMarkScope").value = "8";
+        document.getElementById("pwMarkAnalyzerResults").innerHTML =
+          "Select filters and tap “RANK MARKS”.";
+      }
+
+      function resetPick2AnalyzerFilters() {
+        document.getElementById("p2AnalyzerDay").value = "ALL";
+        document.getElementById("p2AnalyzerTime").value = "ALL";
+        document.getElementById("p2AnalyzerScope").value = "8";
+        document.getElementById("p2AnalyzerResults").innerHTML =
+          "Select filters and tap “RANK PAIRS”.";
+      }
+      function unlockAnalyzer(event, game) {
+        event.preventDefault();
+        const code = document.getElementById(`${game}UnlockCode`).value.toUpperCase();
+        const correctCode = "CWG525";
+
+        if (code === correctCode) {
+          document.getElementById(`${game}AnalyzerUnlock`).style.display = "none";
+          document.getElementById(`${game}AnalyzerContent`).classList.add("unlocked");
+        } else {
+          alert("Invalid code. Please try again.");
+          document.getElementById(`${game}UnlockCode`).value = "";
+          document.getElementById(`${game}UnlockCode`).focus();
+        }
+      }
+
+
+
+      function copyPreviousWeekPreview(game = "pw") {
+        const previewContainer = document.getElementById(
+          `${game}-realtime-preview`,
+        );
+        if (!previewContainer) return;
+        let copyText = previewContainer.dataset.copyText || "";
+
+        if (!copyText) {
+          const headerText = previewContainer
+            .querySelector(".realtime-preview-header span")
+            ?.textContent?.trim();
+          const previewContent = document
+            .getElementById(`${game}-realtime-preview-content`)
+            ?.textContent?.trim();
+          if (headerText && previewContent) {
+            copyText = `${headerText} : ${previewContent}`;
+          }
+        }
+
+        if (!copyText) {
+          alert("Nothing available to copy.");
+          return;
+        }
+
+        const fallbackCopy = (text) => {
+          const textarea = document.createElement("textarea");
+          textarea.value = text;
+          textarea.setAttribute("readonly", "");
+          textarea.style.position = "absolute";
+          textarea.style.left = "-9999px";
+          document.body.appendChild(textarea);
+          textarea.select();
+          textarea.setSelectionRange(0, text.length);
+          let successful = false;
+          try {
+            successful = document.execCommand("copy");
+          } catch (err) {
+            successful = false;
+          }
+          document.body.removeChild(textarea);
+          return successful;
+        };
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard
+            .writeText(copyText)
+            .then(() => {
+              alert("Copied: " + copyText);
+            })
+            .catch(() => {
+              const success = fallbackCopy(copyText);
+              alert(
+                success
+                  ? "Copied: " + copyText
+                  : "Unable to copy preview text.",
+              );
+            });
+        } else {
+          const success = fallbackCopy(copyText);
+          alert(
+            success ? "Copied: " + copyText : "Unable to copy preview text.",
+          );
+        }
       }
 
       // Also add the missing generateBall and generateMarkBall helper functions if needed
@@ -2463,6 +3807,57 @@
                       </div>`;
         });
         return html + `</div></div>`;
+      }
+
+      // 5.5. WHE PLAY CHART (Marks • Spirit • Partner • Mirror)
+      function renderWhePlayMarksChart(
+        currentWeekDraws,
+        activeHighlights,
+        highlightColors,
+      ) {
+        const rows = Array.from({ length: 36 }, (_, i) => i + 1);
+        const leftCards = [];
+        const rightCards = [];
+
+        rows.forEach((num) => {
+          const data = playWheMasterData[num];
+          if (!data) return;
+
+          const numStr = String(num).padStart(2, "0");
+          const isActive = activeHighlights.includes(numStr);
+          const isHit = currentWeekDraws.includes(num);
+          const highlightColor = highlightColors[numStr] || "#ffffff";
+
+          const rowStyle = `display:flex; align-items:center; gap:10px; padding:8px; border-radius:12px; background:#ffffff; border:${isHit ? "2px solid #4472c4" : "1px solid #ddd"}; box-shadow: 0 1px 3px rgba(0,0,0,0.06);`;
+          const numberStyle = `width:34px; height:34px; min-width:34px; border-radius:50%; background:${numberColors[numStr] || "#ffffff"}; display:flex; align-items:center; justify-content:center; font-weight:800; color:#000; ${isActive ? `box-shadow: 0 0 0 3px ${highlightColor};` : ``}`;
+
+          const cardHtml = `<div style="${rowStyle}">
+              <div style="${numberStyle}">${num}</div>
+              <div style="flex:1; min-width:0;">
+                <div style="font-size:13px; font-weight:700; color:#111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${data.name}</div>
+                <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:4px; font-size:11px; color:#111;">
+                  <span style="background:#eef4ff; color:#1d3c7b; border-radius:999px; padding:2px 6px;">S:${String(data.spirit).padStart(2, "0")}</span>
+                  <span style="background:#fff4e6; color:#7a5200; border-radius:999px; padding:2px 6px;">P:${String(data.partner).padStart(2, "0")}</span>
+                  <span style="background:#f3f3f3; color:#333; border-radius:999px; padding:2px 6px;">M:${String(data.mirror).padStart(2, "0")}</span>
+                </div>
+              </div>
+            </div>`;
+
+          if (num <= 18) leftCards.push(cardHtml);
+          else rightCards.push(cardHtml);
+        });
+
+        return `
+          <div style="background: white; border: 1px solid #ccc; border-radius: 16px; padding: 16px; font-family: Arial, sans-serif; margin-top: 20px;">
+            <div style="text-align:center; margin-bottom: 12px;">
+              <div style="font-weight:800; color:#58a6ff; font-size:16px;">WHE PLAY CHART</div>
+              <div style="color:#666; font-size:12px; margin-top:4px;">Mark • Spirit • Partner • Mirror</div>
+            </div>
+            <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
+              <div>${leftCards.join("")}</div>
+              <div>${rightCards.join("")}</div>
+            </div>
+          </div>`;
       }
 
       // 6. Sunny Side Up - Cleaned version using only dynamic highlights
@@ -3204,6 +4599,8 @@
                           ${renderOneEightChart(currentWeekDraws, activeHighlights, highlightColors)}
                           <br>
                           ${renderOneSixteenChart(currentWeekDraws, activeHighlights, highlightColors)}
+                          <br>
+                          ${renderWhePlayMarksChart(currentWeekDraws, activeHighlights, highlightColors)}
                       </div>
                       </div>
                       
