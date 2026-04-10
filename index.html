@@ -2585,13 +2585,11 @@
         let previousWeekIndex = currentWeekIndex - 1;
 
         const isHolidayDay = (day) => {
-          if (!day) return false;
-          return ["MOR", "MID", "NON", "EVE"].some((slot) => {
+          if (!day) return true;
+          return ["MOR", "MID", "NON", "EVE"].every((slot) => {
             const val = day.draws[slot];
-            return (
-              typeof val === "string" &&
-              val.trim().toUpperCase().includes("HOLIDAY")
-            );
+            const text = typeof val === "string" ? val.trim().toUpperCase() : val;
+            return !text || text === "-" || text === "PENDING" || text === "HOLIDAY";
           });
         };
 
@@ -2633,14 +2631,14 @@
           ? formatShortDate(previewDateObj)
           : `${previewDayName.slice(0, 3)}`;
         const titleText = showNextDay
-          ? `What We're Coming Under Tomorrow<br> (${previewLabel})`
-          : `What We're Coming Under Today<br> (${previewLabel})`;
+          ? `What We're Coming Under Tomorrow<br/>(${previewLabel})`
+          : `What We're Coming Under Today<br/>(${previewLabel})`;
 
         const headerSpan = previewContainer.querySelector(
           ".realtime-preview-header span",
         );
         if (headerSpan) {
-          headerSpan.textContent = titleText;
+          headerSpan.innerHTML = titleText;
         }
 
         const slotsOrder = ["MOR", "MID", "NON", "EVE"];
@@ -2707,13 +2705,11 @@
         let previousWeekIndex = currentWeekIndex - 1;
 
         const isHolidayDay = (day) => {
-          if (!day) return false;
-          return ["MOR", "MID", "NON", "EVE"].some((slot) => {
+          if (!day) return true;
+          return ["MOR", "MID", "NON", "EVE"].every((slot) => {
             const val = day.draws[slot];
-            return (
-              typeof val === "string" &&
-              val.trim().toUpperCase().includes("HOLIDAY")
-            );
+            const text = typeof val === "string" ? val.trim().toUpperCase() : val;
+            return !text || text === "-" || text === "PENDING" || text === "HOLIDAY";
           });
         };
 
@@ -2755,14 +2751,14 @@
           ? formatShortDate(previewDateObj)
           : `${previewDayName.slice(0, 3)}`;
         const titleText = showNextDay
-          ? `What We're Coming Under Tomorrow<br> (${previewLabel})`
-          : `What We're Coming Under Today<br> (${previewLabel})`;
+          ? `What We're Coming Under Tomorrow<br/>(${previewLabel})`
+          : `What We're Coming Under Today<br/>(${previewLabel})`;
 
         const headerSpan = previewContainer.querySelector(
           ".realtime-preview-header span",
         );
         if (headerSpan) {
-          headerSpan.textContent = titleText;
+          headerSpan.innerHTML = titleText;
         }
 
         const slotsOrder = ["MOR", "MID", "NON", "EVE"];
@@ -2831,13 +2827,11 @@
         let previousWeekIndex = currentWeekIndex - 1;
 
         const isHolidayDay = (day) => {
-          if (!day) return false;
-          return ["MOR", "MID", "NON", "EVE"].some((slot) => {
+          if (!day) return true;
+          return ["MOR", "MID", "NON", "EVE"].every((slot) => {
             const val = day.draws[slot];
-            return (
-              typeof val === "string" &&
-              val.trim().toUpperCase().includes("HOLIDAY")
-            );
+            const text = typeof val === "string" ? val.trim().toUpperCase() : val;
+            return !text || text === "-" || text === "PENDING" || text === "HOLIDAY";
           });
         };
 
@@ -2879,14 +2873,14 @@
           ? formatShortDate(previewDateObj)
           : `${previewDayName.slice(0, 3)}`;
         const titleText = showNextDay
-          ? `What We're Coming Under Tomorrow<br> (${previewLabel})`
-          : `What We're Coming Under Today<br> (${previewLabel})`;
+          ? `What We're Coming Under Tomorrow<br/>(${previewLabel})`
+          : `What We're Coming Under Today<br/>(${previewLabel})`;
 
         const headerSpan = previewContainer.querySelector(
           ".realtime-preview-header span",
         );
         if (headerSpan) {
-          headerSpan.textContent = titleText;
+          headerSpan.innerHTML = titleText;
         }
 
         const slotsOrder = ["MOR", "MID", "NON", "EVE"];
@@ -3456,6 +3450,122 @@
         });
 
         return html + `</tbody></table></div>`;
+      }
+
+      function parsePick2DrawNumbers(val) {
+        if (!val) return [];
+        const nums = val
+          .toString()
+          .split(/[,\/\-]/)
+          .map((n) => parseInt(n.trim(), 10))
+          .filter((n) => !isNaN(n));
+        if (nums.length === 2 && nums[0] === nums[1]) {
+          return [nums[0]];
+        }
+        return nums;
+      }
+
+      function renderPick2ShelfMarksChart(historyWeeks, currentWeekDraws) {
+        const shelfMarks = [];
+        const today = new Date();
+        const allDraws = [];
+
+        historyWeeks.forEach((week) => {
+          week.days.forEach((day) => {
+            Object.values(day.draws).forEach((val) => {
+              if (val && val !== "-" && val !== "PENDING") {
+                const numbers = parsePick2DrawNumbers(val);
+                const parts = week.startDate.split(" ");
+                const monthMap = {
+                  Jan: 0,
+                  Feb: 1,
+                  Mar: 2,
+                  Apr: 3,
+                  May: 4,
+                  Jun: 5,
+                  Jul: 6,
+                  Aug: 7,
+                  Sep: 8,
+                  Oct: 9,
+                  Nov: 10,
+                  Dec: 11,
+                };
+                const actualDate = new Date(
+                  parseInt(parts[2]),
+                  monthMap[parts[1]],
+                  parseInt(parts[0]),
+                );
+                numbers.forEach((num) => {
+                  if (!isNaN(num)) {
+                    allDraws.push({ num, date: actualDate });
+                  }
+                });
+              }
+            });
+          });
+        });
+
+        for (let n = 1; n <= 36; n++) {
+          const occurrences = allDraws.filter((d) => d.num === n);
+          const lastMatch =
+            occurrences.length > 0 ? occurrences[occurrences.length - 1] : null;
+          let days = lastMatch
+            ? Math.floor((today - lastMatch.date) / (1000 * 60 * 60 * 24))
+            : 99;
+          let lastDate = "N/A";
+          if (lastMatch) {
+            const d = lastMatch.date;
+            const formatted = d
+              .toLocaleDateString("en-GB", {
+                weekday: "short",
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })
+              .replace(/,/g, "");
+            lastDate = formatted.replace(/(\d{2})(\d{2})$/, "'$2");
+          }
+
+          if (days > 10) shelfMarks.push({ num: n, lastDate, days });
+        }
+        shelfMarks.sort((a, b) => b.days - a.days);
+
+        let html = `
+              <div style="background: white; border: 1px solid #ccc; font-family: Arial, sans-serif;">
+                  <div style="background: #4472c4; color: white; padding: 8px; text-align: center; font-weight: bold; font-size: 14px;">SHELF MARKS</div>
+                  <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: center;">
+                      <thead>
+                          <tr style="background: #f2f2f2; border-bottom: 2px solid #4472c4;">
+                              <th style="padding: 6px; border: 1px solid #ddd;">Nums</th>
+                              <th style="padding: 6px; border: 1px solid #ddd;">Last Played</th>
+                              <th style="padding: 6px; border: 1px solid #ddd;">Days</th>
+                          </tr>
+                      </thead>
+                      <tbody>`;
+
+        shelfMarks.forEach((mark) => {
+          let numStyle = "font-weight: bold;";
+          if (mark.days >= 30) numStyle += "background: #ff0000; color: white;";
+          else if (mark.days >= 19)
+            numStyle += "background: #ffff00; color: black;";
+
+          html += `
+                  <tr style="border-bottom: 1px solid #eee;">
+                      <td style="padding: 6px; border: 1px solid #ddd; ${numStyle}">${mark.num}</td>
+                      <td style="padding: 6px; border: 1px solid #ddd; color: #666;">${mark.lastDate}</td>
+                      <td style="padding: 6px; border: 1px solid #ddd; font-weight: bold; color: ${mark.days >= 30 ? "red" : "#4472c4"};">${mark.days}</td>
+                  </tr>`;
+        });
+
+        return html + `</tbody></table></div>`;
+      }
+
+      function renderPick2LinesPlayedChart(currentWeekDraws) {
+        return renderLinesPlayedChart(currentWeekDraws);
+      }
+
+      function renderPick2SuitesPlayedChart(currentWeekDraws) {
+        return renderSuitesPlayedChart(currentWeekDraws);
       }
 
       // 2. Lines Played This Week - Each number individually highlighted
@@ -4121,6 +4231,7 @@
         let activeHighlights = [];
         let highlightColors = {};
         let highlightMap = new Map(); // Maps combination keys to colors
+        let currentWeekDraws = [];
 
         // GLOBAL POSITION TRACKING (Needed for all games to show "HOLIDAY" vs "—")
         let currentDayIndex = -1,
@@ -4329,6 +4440,20 @@
             Array.from(currentCombinations.entries()),
           ); // Debug log
 
+          currentWeekDraws = [];
+          dayNames.forEach((dayName) => {
+            slots.forEach((slot) => {
+              const draw = getDraw(currentWk, dayName, slot);
+              if (!draw) return;
+              const numbers = parsePick2DrawNumbers(draw);
+              numbers.forEach((num) => {
+                if (!isNaN(num)) {
+                  currentWeekDraws.push(num);
+                }
+              });
+            });
+          });
+
           // Now, build highlight map for ALL weeks (including current)
           historyWeeks.forEach((wk, wkIdx) => {
             dayNames.forEach((dayName) => {
@@ -4357,6 +4482,20 @@
         }
         // ========== PICK 4 HIGHLIGHT LOGIC ==========
         else if (game === "p4") {
+          // Build current week draws for Pick 4 if needed later
+          currentWeekDraws = [];
+          dayNames.forEach((dayName) => {
+            slots.forEach((slot) => {
+              const draw = getDraw(currentWk, dayName, slot);
+              if (draw) {
+                const num = parseInt(draw, 10);
+                if (!isNaN(num)) {
+                  currentWeekDraws.push(num);
+                }
+              }
+            });
+          });
+
           // Colors for highlighting (green, yellow, orange, blue)
           const colors = ["#32d74b", "#ffd700", "#ff9f0a", "#58a6ff"];
 
@@ -4617,8 +4756,22 @@
               `;
 
           container.innerHTML = html + chartsHTML;
+        } else if (game === "p2") {
+          const chartsHTML = `
+                  <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #ccc;">
+                      <h3 style="color: #007AFF; text-align: center; margin-bottom: 20px;"> CWG PICK 2 CHARTS</h3>
+                      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 20px;">
+                          ${renderPick2ShelfMarksChart(historyWeeks, currentWeekDraws)}
+                          <div style="display: flex; flex-direction: column; gap: 20px;">
+                              ${renderPick2LinesPlayedChart(currentWeekDraws)}
+                              ${renderPick2SuitesPlayedChart(currentWeekDraws)}
+                          </div>
+                      </div>
+                  </div>`;
+
+          container.innerHTML = html + chartsHTML;
         } else {
-          // For Pick 2 and Pick 4, just show the table
+          // For Pick 4, just show the table
           container.innerHTML = html;
         }
 
