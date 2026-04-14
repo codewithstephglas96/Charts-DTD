@@ -483,6 +483,11 @@
         vertical-align: middle;
       }
 
+      .export-search-highlight {
+        background: #fff5c2 !important;
+        outline: 2px solid #f5a623 !important;
+      }
+
       /* Style for the week row */
       .export-table .row-current {
         background: #fad105 !important;
@@ -1158,9 +1163,9 @@
               <h3><span class="pulse-dot">🔴</span> LIVE - TODAY</h3>
               <button
                 class="download-btn realtime-save-btn"
-                onclick="downloadChart('pw-container', 'PlayWhe_DayToDay')"
+                onclick="downloadRealtimeAndSupportCharts('pw', this)"
               >
-               <i class="fas fa-camera"></i> SAVE PLAY WHE CHART
+               <i class="fas fa-camera"></i> SAVE PLAY WHE
               </button>
             </div>
             <span class="realtime-time" id="pw-realtime-time">Loading...</span>
@@ -1269,9 +1274,9 @@
               <h3><span class="pulse-dot">🔴</span> LIVE - TODAY</h3>
               <button
                 class="download-btn realtime-save-btn"
-                onclick="downloadChart('p2-container', 'Pick2_DayToDay')"
+                onclick="downloadRealtimeAndSupportCharts('p2', this)"
               >
-                <i class="fas fa-camera"></i> SAVE PICK 2 CHART
+                <i class="fas fa-camera"></i> SAVE PICK 2
               </button>
             </div>
             <span class="realtime-time" id="p2-realtime-time">Loading...</span>
@@ -1380,7 +1385,7 @@
                 class="download-btn realtime-save-btn"
                 onclick="downloadChart('p4-container', 'Pick4_DayToDay')"
               >
-                <i class="fas fa-camera"></i> SAVE PICK 4 CHART
+                <i class="fas fa-camera"></i> SAVE PICK 4
               </button>
             </div>
             <span class="realtime-time" id="p4-realtime-time">Loading...</span>
@@ -1706,14 +1711,20 @@
     <script>
       // ========== CONSTANTS ==========
       const BASE_API =
-        "https://script.google.com/macros/s/AKfycbwyr-M_ZzIscNgxJmR_UYHgZqmamn62Np4msDFaCjX9KgyUmyjuzuIYbawBmT0_mw4j/exec?action=calendar&weeks=150";
+        "https://script.google.com/macros/s/AKfycbwyr-M_ZzIscNgxJmR_UYHgZqmamn62Np4msDFaCjX9KgyUmyjuzuIYbawBmT0_mw4j/exec?action=calendar";
       const TICKER_API =
         "https://script.google.com/macros/s/AKfycbymSUZ3cuBP7wZSKkxs8QmjMkKP6q3j-LOW_CVpY3n6Sw1EzsdwPu6yTEkpOmiAJz95/exec?action=ticker";
 
       const GAME_URLS = {
-        playwhe: BASE_API + "&game=P2WHE",
-        pick2: BASE_API + "&game=PIKII",
-        pick4: BASE_API + "&game=PIKIV",
+        playwhe: BASE_API + "&weeks=150&game=P2WHE",
+        pick2: BASE_API + "&weeks=150&game=PIKII",
+        pick4: BASE_API + "&weeks=150&game=PIKIV",
+      };
+
+      const GAME_URLS_FAST = {
+        playwhe: BASE_API + "&weeks=8&game=P2WHE",
+        pick2: BASE_API + "&weeks=8&game=PIKII",
+        pick4: BASE_API + "&weeks=8&game=PIKIV",
       };
 
       const CACHE_VERSION = "v2_1";
@@ -1799,6 +1810,7 @@
       async function loadGameData(gameKey, url) {
         const cacheKey = CACHE_KEYS[gameKey];
         const cached = getCache(cacheKey);
+        const fastUrl = GAME_URLS_FAST[gameKey];
 
         if (cached && cached.data) {
           try {
@@ -1811,6 +1823,18 @@
           return;
         }
 
+        // First load 8 weeks quickly, then refresh the full dataset in the background.
+        try {
+          const fastData = await fetchJson(`${fastUrl}&_t=${Date.now()}`);
+          setCache(cacheKey, fastData);
+          processGameData(gameKey, fastData);
+          refreshGameData(gameKey, url, cacheKey);
+          return;
+        } catch (fastError) {
+          console.warn(`Fast 8-week load failed for ${gameKey}:`, fastError);
+        }
+
+        // Fallback to full data if the fast request fails.
         try {
           const data = await fetchJson(`${url}&_t=${Date.now()}`);
           setCache(cacheKey, data);
@@ -1896,7 +1920,7 @@
           spirit: 24,
           partner: 17,
           mirror: 35,
-          emoji: "👵🏾",
+          emoji: "👵",
         },
         3: {
           name: "CARRIAGE",
@@ -1911,201 +1935,123 @@
           spirit: 1,
           partner: 20,
           mirror: 32,
-          emoji: "👨🏾‍🦳",
+          emoji: "🧍🏽‍♂️",
         },
         6: { name: "BELLY", spirit: 15, partner: 21, mirror: 31, emoji: "🤰" },
         7: { name: "HOG", spirit: 13, partner: 22, mirror: 30, emoji: "🐗" },
         8: { name: "TIGER", spirit: 29, partner: 23, mirror: 29, emoji: "🐅" },
         9: { name: "CATTLE", spirit: 33, partner: 24, mirror: 28, emoji: "🐄" },
         10: {
-              name: "MONKEY",
-              spirit: 28,
-              partner: 25,
-              mirror: 27,
-              emoji: "🐒",
+          name: "MONKEY",
+          spirit: 28,
+          partner: 25,
+          mirror: 27,
+          emoji: "🐒",
         },
         11: {
-              name: "CORBEAU",
-              spirit: 11,
-              partner: 26,
-              mirror: 26,
-              emoji: "🦅",
+          name: "CORBEAU",
+          spirit: 11,
+          partner: 26,
+          mirror: 26,
+          emoji: "🐦‍🔥",
         },
-        12: { 
-              name: "KING", 
-              spirit: 32, 
-              partner: 27, 
-              mirror: 25, 
-              emoji: "👑" 
-        },
+        12: { name: "KING", spirit: 32, partner: 27, mirror: 25, emoji: "👑" },
         13: {
-              name: "CRAPAUD",
-              spirit: 7,
-              partner: 28,
-              mirror: 24,
-              emoji: "🐸",
+          name: "CRAPAUD",
+          spirit: 7,
+          partner: 28,
+          mirror: 24,
+          emoji: "🐸",
         },
-        14: { 
-              name: "MONEY", 
-              spirit: 25, 
-              partner: 29, 
-              mirror: 23, 
-              emoji: "💰" 
-        },
+        14: { name: "MONEY", spirit: 25, partner: 29, mirror: 23, emoji: "💰" },
         15: {
-              name: "SICK WOMAN",
-              spirit: 9,
-              partner: 30,
-              mirror: 22,
-              emoji: "😷",
+          name: "SICK WOMAN",
+          spirit: 9,
+          partner: 30,
+          mirror: 22,
+          emoji: "🤧",
         },
         16: {
-              name: "JAMETTE",
-              spirit: 17,
-              partner: 31,
-              mirror: 21,
-              emoji: "💃",
+          name: "JAMETTE",
+          spirit: 17,
+          partner: 31,
+          mirror: 21,
+          emoji: "💃",
         },
         17: {
-              name: "PIGEON",
-              spirit: 18,
-              partner: 32,
-              mirror: 20,
-              emoji: "🦜",
+          name: "PIGEON",
+          spirit: 18,
+          partner: 32,
+          mirror: 20,
+          emoji: "🦜",
         },
         18: {
-              name: "WATER BOAT",
-              spirit: 30,
-              partner: 33,
-              mirror: 19,
-              emoji: "🚤",
+          name: "WATER BOAT",
+          spirit: 30,
+          partner: 33,
+          mirror: 19,
+          emoji: "🚤",
         },
-        19: { 
-              name: "HORSE", 
-              spirit: 5, 
-              partner: 34, 
-              mirror: 18, 
-              emoji: "🐎" 
-        },
-        20: { 
-              name: "DOG", 
-              spirit: 22, 
-              partner: 35, 
-              mirror: 17, 
-              emoji: "🐕" 
-        },
-        21: { 
-              name: "MOUTH", 
-              spirit: 23, 
-              partner: 36, 
-              mirror: 16, 
-              emoji: "👄" 
-        },
-        22: { 
-              name: "RAT", 
-              spirit: 20, 
-              partner: 1, 
-              mirror: 15, 
-              emoji: "🐀" 
-        },
-        23: { 
-              name: "HOUSE", 
-              spirit: 21, 
-              partner: 2, 
-              mirror: 14, 
-              emoji: "🏠" 
-        },
-        24: { 
-              name: "QUEEN", 
-              spirit: 2, 
-              partner: 3, 
-              mirror: 13, 
-              emoji: "👑" 
-        },
+        19: { name: "HORSE", spirit: 5, partner: 34, mirror: 18, emoji: "🐎" },
+        20: { name: "DOG", spirit: 22, partner: 35, mirror: 17, emoji: "🐕" },
+        21: { name: "MOUTH", spirit: 23, partner: 36, mirror: 16, emoji: "👄" },
+        22: { name: "RAT", spirit: 20, partner: 1, mirror: 15, emoji: "🐀" },
+        23: { name: "HOUSE", spirit: 21, partner: 2, mirror: 14, emoji: "🏠" },
+        24: { name: "QUEEN", spirit: 2, partner: 3, mirror: 13, emoji: "👑" },
         25: {
-              name: "MOROCOY",
-              spirit: 14,
-              partner: 4,
-              mirror: 12,
-              emoji: "🐢",
+          name: "MOROCOY",
+          spirit: 14,
+          partner: 4,
+          mirror: 12,
+          emoji: "🐢",
         },
-        26: { 
-              name: "FOWL", 
-              spirit: 27, 
-              partner: 5, 
-              mirror: 11, 
-              emoji: "🐓" 
-        },
+        26: { name: "FOWL", spirit: 27, partner: 5, mirror: 11, emoji: "🐓" },
         27: {
-              name: "LITTLE SNAKE",
-              spirit: 16,
-              partner: 6,
-              mirror: 10,
-              emoji: "🐍",
+          name: "LITTLE SNAKE",
+          spirit: 16,
+          partner: 6,
+          mirror: 10,
+          emoji: "🐍",
         },
-        28: { 
-              name: "FISH", 
-              spirit: 10, 
-              partner: 7, 
-              mirror: 9, 
-              emoji: "🐟" 
-        },
+        28: { name: "FISH", spirit: 10, partner: 7, mirror: 9, emoji: "🐟" },
         29: {
-              name: "OPIUM MAN",
-              spirit: 4,
-              partner: 8,
-              mirror: 8,
-              emoji: "🥃",
+          name: "OPIUM MAN",
+          spirit: 4,
+          partner: 8,
+          mirror: 8,
+          emoji: "🥴",
         },
         30: {
-              name: "HOUSE CAT",
-              spirit: 12,
-              partner: 9,
-              mirror: 7,
-              emoji: "🐈",
+          name: "HOUSE CAT",
+          spirit: 12,
+          partner: 9,
+          mirror: 7,
+          emoji: "🐈",
         },
         31: {
-              name: "PARSON WIFE",
-              spirit: 34,
-              partner: 10,
-              mirror: 6,
-              emoji: "👵🏾",
+          name: "PARSON WIFE",
+          spirit: 34,
+          partner: 10,
+          mirror: 6,
+          emoji: "👰",
         },
-        32: { 
-              name: "SHRIMPS", 
-              spirit: 8, 
-              partner: 11, 
-              mirror: 5, 
-              emoji: "🦐" 
-        },
-        33: { 
-              name: "SPIDER", 
-              spirit: 26, 
-              partner: 12, 
-              mirror: 4, 
-              emoji: "🕷️" 
-        },
+        32: { name: "SHRIMPS", spirit: 8, partner: 11, mirror: 5, emoji: "🦐" },
+        33: { name: "SPIDER", spirit: 26, partner: 12, mirror: 4, emoji: "🕷️" },
         34: {
-              name: "BLIND MAN",
-              spirit: 31,
-              partner: 13,
-              mirror: 3,
-              emoji: "👨‍🦯",
+          name: "BLIND MAN",
+          spirit: 31,
+          partner: 13,
+          mirror: 3,
+          emoji: "👨‍🦯",
         },
         35: {
-              name: "BIG SNAKE",
-              spirit: 4,
-              partner: 14,
-              mirror: 2,
-              emoji: "🐍",
+          name: "BIG SNAKE",
+          spirit: 4,
+          partner: 14,
+          mirror: 2,
+          emoji: "🐍",
         },
-        36: { 
-              name: "DONKEY", 
-              spirit: 11, 
-              partner: 15, 
-              mirror: 1, 
-              emoji: "🫏" 
-        },
+        36: { name: "DONKEY", spirit: 11, partner: 15, mirror: 1, emoji: "🫏" },
       };
 
       // Mark colors for Play Whe
@@ -2213,56 +2159,207 @@
       }
 
       // ========== DOWNLOAD CHART FUNCTION ==========
-      async function downloadChart(containerId, fileName) {
+      function getChartBackgroundColor() {
+        const bgColor = getComputedStyle(document.body)
+          .getPropertyValue("--bg-primary")
+          .trim();
+        return bgColor ||
+          (document.body.classList.contains("light-mode")
+            ? "#f5f5f5"
+            : "#0a0c10");
+      }
+
+      function getTimestampSuffix() {
+        return new Date()
+          .toISOString()
+          .slice(0, 19)
+          .replace(/:/g, "-");
+      }
+
+      function setButtonSaving(button, saving, label) {
+        if (!button) return;
+        if (saving) {
+          button.dataset.originalHtml = button.dataset.originalHtml || button.innerHTML;
+          button.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${label}`;
+          button.disabled = true;
+        } else {
+          button.innerHTML = button.dataset.originalHtml || button.innerHTML;
+          button.disabled = false;
+        }
+      }
+
+      async function captureElementAsImage(element, fileName, backgroundColor) {
+        if (!element) {
+          throw new Error("Element not found for capture");
+        }
+
+        const canvas = await html2canvas(element, {
+          backgroundColor: backgroundColor,
+          scale: 3,
+          logging: false,
+          useCORS: true,
+          allowTaint: false,
+        });
+
+        const link = document.createElement("a");
+        link.download = `${fileName}_${getTimestampSuffix()}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      }
+
+      async function downloadChart(containerId, fileName, button) {
         const element = document.getElementById(containerId);
         if (!element) {
           console.error("Element not found:", containerId);
           return;
         }
 
-        // Find the button that was clicked
-        const btn = event?.currentTarget;
-        let originalIcon = "";
-        if (btn) {
-          originalIcon = btn.innerHTML;
-          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-          btn.disabled = true;
-        }
+        const btn = button || event?.currentTarget;
+        setButtonSaving(btn, true, "Saving...");
 
         try {
-          // Get the current theme background color
-          const bgColor = getComputedStyle(document.body)
-            .getPropertyValue("--bg-primary")
-            .trim();
-
-          const canvas = await html2canvas(element, {
-            backgroundColor:
-              bgColor ||
-              (document.body.classList.contains("light-mode")
-                ? "#f5f5f5"
-                : "#0a0c10"),
-            scale: 3, // High quality for HD
-            logging: false,
-            useCORS: true,
-            allowTaint: false,
-          });
-
-          const link = document.createElement("a");
-          const timestamp = new Date()
-            .toISOString()
-            .slice(0, 19)
-            .replace(/:/g, "-");
-          link.download = `${fileName}_${timestamp}.png`;
-          link.href = canvas.toDataURL("image/png");
-          link.click();
+          await captureElementAsImage(element, fileName, getChartBackgroundColor());
         } catch (err) {
           console.error("Capture failed:", err);
           alert("Failed to capture image. Please try again.");
         } finally {
-          if (btn) {
-            btn.innerHTML = originalIcon;
-            btn.disabled = false;
+          setButtonSaving(btn, false);
+        }
+      }
+
+      async function downloadRealtimeAndSupportCharts(game, button) {
+        const btn = button || event?.currentTarget;
+        setButtonSaving(btn, true, "Saving...");
+
+        try {
+          const realtimeInfo = {
+            pw: { containerId: "pw-container", fileName: "PlayWhe_DayToDay" },
+            p2: { containerId: "p2-container", fileName: "Pick2_DayToDay" },
+          };
+
+          if (!realtimeInfo[game]) {
+            console.warn("Realtime save not supported for game:", game);
+            return;
           }
+
+          const { containerId, fileName } = realtimeInfo[game];
+          await captureElementAsImage(
+            document.getElementById(containerId),
+            fileName,
+            getChartBackgroundColor(),
+          );
+          await captureGameSupportCharts(game);
+        } catch (err) {
+          console.error("Dual chart capture failed:", err);
+          alert("Failed to save charts. Please try again.");
+        } finally {
+          setButtonSaving(btn, false);
+        }
+      }
+
+      async function captureGameSupportCharts(game) {
+        const gameName = game === "pw" ? "PlayWhe" : "Pick2";
+        const gameStateKey = game === "pw" ? "playwhe" : "pick2";
+        const gameData = gameState[gameStateKey];
+
+        const weeksData =
+          gameData.fullWeeks && gameData.fullWeeks.length > 0
+            ? gameData.fullWeeks
+            : gameData.weeks;
+
+        if (!weeksData || weeksData.length === 0) {
+          throw new Error("No history data available for support charts.");
+        }
+
+        const weeks = [...weeksData].reverse();
+        const weekLimit = parseInt(
+          document.getElementById(`modalWeekCount-${game}`)?.value || "8",
+          10,
+        );
+        const historyWeeks = weeks.slice(-Math.min(weekLimit, weeks.length));
+        const currentWk = weeks[weeks.length - 1];
+
+        const dayNames = [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ];
+        const slots = ["MOR", "MID", "NON", "EVE"];
+
+        const getDraw = (wk, dayName, slot) => {
+          if (!wk) return null;
+          const day = wk.days.find((d) => d.dayName === dayName);
+          if (!day) return null;
+          const val = day.draws[slot];
+          return val && val !== "-" && val !== "PENDING" ? val.toString() : null;
+        };
+
+        const currentWeekDraws = [];
+        dayNames.forEach((dayName) => {
+          slots.forEach((slot) => {
+            const draw = getDraw(currentWk, dayName, slot);
+            if (!draw) return;
+            if (game === "pw") {
+              const num = parseInt(draw, 10);
+              if (!isNaN(num)) currentWeekDraws.push(num);
+            } else {
+              parsePick2DrawNumbers(draw).forEach((num) => {
+                if (!isNaN(num)) currentWeekDraws.push(num);
+              });
+            }
+          });
+        });
+
+        const container = document.createElement("div");
+        container.style.backgroundColor = "#ffffff";
+        container.style.color = "#111";
+        container.style.padding = "24px";
+        container.style.display = "inline-block";
+        container.style.position = "fixed";
+        container.style.top = "-9999px";
+        container.style.left = "-9999px";
+        container.style.width = "1200px";
+        container.style.maxWidth = "1200px";
+        container.style.boxSizing = "border-box";
+        container.style.fontFamily = "Arial, sans-serif";
+
+        const headerHtml = `<div style="text-align:center; margin-bottom: 20px;">
+            <div style="font-size:18px; font-weight:800; color:#007AFF;">${gameName} Support Charts</div>
+            <div style="font-size:12px; color:#666; margin-top:6px;">Shelf Marks + Lines Played This Week + Suites Played This Week</div>
+          </div>`;
+
+        let chartsHtml = "";
+        if (game === "pw") {
+          chartsHtml = `
+            <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:20px; margin-bottom:20px;">
+              ${renderShelfMarksChart(historyWeeks, currentWeekDraws)}
+              <div style="display:flex; flex-direction:column; gap:20px;">
+                ${renderLinesPlayedChart(currentWeekDraws)}
+                ${renderSuitesPlayedChart(currentWeekDraws)}
+              </div>
+            </div>`;
+        } else {
+          chartsHtml = `
+            <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:20px; margin-bottom:20px;">
+              ${renderPick2ShelfMarksChart(historyWeeks, currentWeekDraws)}
+              <div style="display:flex; flex-direction:column; gap:20px;">
+                ${renderPick2LinesPlayedChart(currentWeekDraws)}
+                ${renderPick2SuitesPlayedChart(currentWeekDraws)}
+              </div>
+            </div>`;
+        }
+
+        container.innerHTML = `${headerHtml}${chartsHtml}`;
+        document.body.appendChild(container);
+
+        try {
+          await captureElementAsImage(container, `${gameName}_SupportCharts`, "#ffffff");
+        } finally {
+          document.body.removeChild(container);
         }
       }
 
@@ -3681,6 +3778,44 @@
         document.getElementById(`historyModal-${game}`).style.display = "none";
       }
 
+      function getActualDrawDate(week, day) {
+        if (!week || !week.startDate || !day || !day.dayName) return null;
+        const monthMap = {
+          Jan: 0,
+          Feb: 1,
+          Mar: 2,
+          Apr: 3,
+          May: 4,
+          Jun: 5,
+          Jul: 6,
+          Aug: 7,
+          Sep: 8,
+          Oct: 9,
+          Nov: 10,
+          Dec: 11,
+        };
+        const parts = week.startDate.split(" ");
+        const startDate = new Date(
+          parseInt(parts[2], 10),
+          monthMap[parts[1]],
+          parseInt(parts[0], 10),
+        );
+        const dayOrder = [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ];
+        const dayOffset = dayOrder.indexOf(day.dayName);
+        if (dayOffset >= 0) {
+          startDate.setDate(startDate.getDate() + dayOffset);
+        }
+        return startDate;
+      }
+
       // Additional Charts In Render Export Table For Play Whe Modal
       // 1. Shelf Marks Table - Only shows numbers not played in last 10 days
       function renderShelfMarksChart(historyWeeks, currentWeekDraws) {
@@ -3693,27 +3828,10 @@
           week.days.forEach((day) => {
             Object.values(day.draws).forEach((val) => {
               if (val && val !== "-" && val !== "PENDING") {
-                const parts = week.startDate.split(" ");
-                const monthMap = {
-                  Jan: 0,
-                  Feb: 1,
-                  Mar: 2,
-                  Apr: 3,
-                  May: 4,
-                  Jun: 5,
-                  Jul: 6,
-                  Aug: 7,
-                  Sep: 8,
-                  Oct: 9,
-                  Nov: 10,
-                  Dec: 11,
-                };
-                const actualDate = new Date(
-                  parseInt(parts[2]),
-                  monthMap[parts[1]],
-                  parseInt(parts[0]),
-                );
-                allDraws.push({ num: parseInt(val), date: actualDate });
+                const actualDate = getActualDrawDate(week, day);
+                if (actualDate) {
+                  allDraws.push({ num: parseInt(val, 10), date: actualDate });
+                }
               }
             });
           });
@@ -3744,7 +3862,7 @@
             lastDate = formatted.replace(/(\d{2})(\d{2})$/, "'$2");
           }
 
-          if (days > 10) shelfMarks.push({ num: n, lastDate, days });
+          if (days > 7) shelfMarks.push({ num: n, lastDate, days });
         }
         shelfMarks.sort((a, b) => b.days - a.days);
 
@@ -3801,31 +3919,14 @@
             Object.values(day.draws).forEach((val) => {
               if (val && val !== "-" && val !== "PENDING") {
                 const numbers = parsePick2DrawNumbers(val);
-                const parts = week.startDate.split(" ");
-                const monthMap = {
-                  Jan: 0,
-                  Feb: 1,
-                  Mar: 2,
-                  Apr: 3,
-                  May: 4,
-                  Jun: 5,
-                  Jul: 6,
-                  Aug: 7,
-                  Sep: 8,
-                  Oct: 9,
-                  Nov: 10,
-                  Dec: 11,
-                };
-                const actualDate = new Date(
-                  parseInt(parts[2]),
-                  monthMap[parts[1]],
-                  parseInt(parts[0]),
-                );
-                numbers.forEach((num) => {
-                  if (!isNaN(num)) {
-                    allDraws.push({ num, date: actualDate });
-                  }
-                });
+                const actualDate = getActualDrawDate(week, day);
+                if (actualDate) {
+                  numbers.forEach((num) => {
+                    if (!isNaN(num)) {
+                      allDraws.push({ num, date: actualDate });
+                    }
+                  });
+                }
               }
             });
           });
@@ -3852,7 +3953,7 @@
             lastDate = formatted.replace(/(\d{2})(\d{2})$/, "'$2");
           }
 
-          if (days > 10) shelfMarks.push({ num: n, lastDate, days });
+          if (days > 7) shelfMarks.push({ num: n, lastDate, days });
         }
         shelfMarks.sort((a, b) => b.days - a.days);
 
@@ -4479,36 +4580,24 @@
 
         if (!weeksData || weeksData.length === 0) {
           container.innerHTML =
-            "<div style='color:red; padding:40px; text-align:center;'>⚠️ Loading data... Please wait</div>";
-          // Try to load full data if not available
+            "<div style='color:red; padding:40px; text-align:center;'>⚠️ No history data available yet.</div>";
+          // If the full dataset has not been loaded yet, refresh it quietly in the background.
           if (!gameData.fullWeeks || gameData.fullWeeks.length === 0) {
-            showLoading("Loading full history data...");
-            fetch(
-              GAME_URLS[
-                game === "pw" ? "playwhe" : game === "p2" ? "pick2" : "pick4"
-              ] +
-                "&_t=" +
-                Date.now(),
-            )
-              .then((r) => r.json())
-              .then((data) => {
-                gameData.fullWeeks = data.data.weeks.reverse();
-                setCachedData(
-                  game === "pw"
-                    ? "PLAY_WHE"
-                    : game === "p2"
-                      ? "PICK_2"
-                      : "PICK_4",
-                  gameData.fullWeeks,
-                );
-                hideLoading();
-                renderExportTable(game); // Re-render
-              })
-              .catch((err) => {
-                hideLoading();
-                container.innerHTML =
-                  "<div style='color:red; padding:40px; text-align:center;'>⚠️ DATA LINK ERROR</div>";
-              });
+            const url =
+              game === "pw"
+                ? GAME_URLS.playwhe
+                : game === "p2"
+                ? GAME_URLS.pick2
+                : GAME_URLS.pick4;
+            refreshGameData(
+              game === "pw" ? "playwhe" : game === "p2" ? "pick2" : "pick4",
+              url,
+              game === "pw"
+                ? CACHE_KEYS.playwhe
+                : game === "p2"
+                ? CACHE_KEYS.pick2
+                : CACHE_KEYS.pick4,
+            );
           }
           return;
         }
@@ -4552,6 +4641,22 @@
         const endStr = historyWeeks[historyWeeks.length - 1].startDate;
         document.getElementById(`modalDateRange-${game}`).innerText =
           "PERIOD: " + startStr + " TO " + endStr;
+
+        const normalizeSearchKey = (rawValue) =>
+          normalizeExportSearchKey(rawValue, game);
+
+        const searchBoxHtml =
+          game === "pw"
+            ? `
+          <div style="margin:16px 0; padding:12px 16px; background:#f8f9fa; border:1px solid #dcdcdc; border-radius:14px; display:flex; flex-wrap:wrap; align-items:center; gap:10px;">
+            <div style="font-size:13px; font-weight:700; min-width:140px;">Search Mark:</div>
+            <input id="exportSearchInput-${game}" type="text" placeholder="e.g. 12" style="flex:1 1 220px; min-width:140px; padding:8px 10px; border:1px solid #ccc; border-radius:10px;" onkeydown="if(event.key==='Enter'){highlightExportSearch('${game}');}" />
+            <button type="button" onclick="highlightExportSearch('${game}')" style="padding:8px 12px; border:none; background:#007aff; color:white; border-radius:10px; cursor:pointer;">Highlight</button>
+            <button type="button" onclick="clearExportSearch('${game}')" style="padding:8px 12px; border:none; background:#6c757d; color:white; border-radius:10px; cursor:pointer;">Clear</button>
+            <div id="exportSearchMessage-${game}" style="font-size:12px; color:#555; min-width:200px;"></div>
+          </div>
+        `
+            : "";
 
         // ========== HIGHLIGHT LOGIC VARIABLES ==========
         let activeHighlights = [];
@@ -4888,7 +4993,7 @@
         }
 
         // ========== BUILD THE TABLE HTML ==========
-        let html = "<table class='export-table'><thead><th>WEEK</th>";
+        let html = searchBoxHtml + "<table class='export-table'><thead><th>WEEK</th>";
         dayNames.forEach((d) => {
           html +=
             "<th colspan='4' style='border-left:2px solid #ccc;'>" +
@@ -4946,68 +5051,54 @@
                 const borderL =
                   sIdx === 0 ? "2px solid #ccc" : "1px solid #eee";
 
-                html +=
-                  "<td style='border-left:" +
-                  borderL +
-                  "; width:28px; height:30px; text-align:center;'>";
+                const valStr = hasValue ? val.toString().trim() : "";
+                const searchKey = hasValue
+                  ? normalizeExportSearchKey(valStr, game)
+                  : "";
+                const dataSearchAttr = searchKey
+                  ? ` data-search="${searchKey}"`
+                  : "";
 
+                let displayVal = valStr;
                 if (hasValue) {
-                  const valStr = val.toString();
-
-                  // Format display based on game type
-                  let displayVal = valStr;
                   if (game === "p2") {
-                    // Pick 2 - show as #,#
                     const nums = valStr.split(/[,\/-]/).map((n) => n.trim());
                     displayVal = nums.join(",");
                   } else if (game === "p4") {
-                    // Pick 4 - show as ####
                     displayVal = valStr.padStart(4, "0");
                   }
+                }
 
-                  // Determine styling based on game type and highlighting
+                html += `<td style='border-left:${borderL}; width:28px; height:30px; text-align:center;'${dataSearchAttr}>`;
+
+                if (hasValue) {
                   let bgColor = "transparent";
                   let textColor = "#000000";
                   let fontWeight = "bold";
 
                   if (game === "pw") {
-                    // Play Whe - use ball styling with colors
-                    bgColor = "#000"; // Default black background for non-highlighted
+                    bgColor = "#000";
                     textColor = "#fff";
-                    fontWeight = "bold";
-
-                    // Check for Play Whe highlights
                     const isHighlighted = activeHighlights.includes(valStr);
                     if (isHighlighted) {
                       bgColor = highlightColors[valStr] || "#ff9f0a";
                       textColor = "#000";
                     }
-
                     html += `<div style="width:18px; height:18px; line-height:18px; border-radius:50%; background:${bgColor}; color:${textColor}; font-weight:bold; font-size:11px; margin:auto;">${displayVal}</div>`;
                   } else {
-                    // Pick 2 and Pick 4 - check if this draw should be highlighted
                     const matchKey = `${wkIdx}-${dayName}-${slot}`;
                     if (highlightMap.has(matchKey)) {
                       bgColor = highlightMap.get(matchKey);
                       textColor = "#000";
-                      fontWeight = "bold";
                       html += `<span style="background:${bgColor}; color:${textColor}; font-weight:${fontWeight}; font-size:11px; padding:2px 4px; border-radius:4px;">${displayVal}</span>`;
                     } else {
-                      // Non-highlighted draws
-                      if (isCurrent) {
-                        // Current week non-highlighted draws
-                        html += `<span style="color:#000;font-size:11px;">${displayVal}</span>`;
-                      } else {
-                        // Previous weeks non-highlighted draws
-                        html += `<span style="color:#000;font-size:11px;">${displayVal}</span>`;
-                      }
+                      html += `<span style="color:#000;font-size:11px;">${displayVal}</span>`;
                     }
                   }
-                } else if (isCurrent) {
-                  html += "<span style='color:#999;'>—</span>";
                 } else {
                   html += "<span style='color:#999;'>—</span>";
                 }
+
                 html += "</td>";
               });
             }
@@ -5102,6 +5193,151 @@
         }
 
         console.log(`Table HTML generated for ${game}`); // Debug log
+      }
+
+      function getPlayWheSearchBallColor(value) {
+        const colorMap = {
+          1: "#ff6b6b",
+          2: "#ffa94d",
+          3: "#ffd43b",
+          4: "#69db7c",
+          5: "#38d9a9",
+          6: "#4dabf7",
+          7: "#9775fa",
+          8: "#f783ac",
+          9: "#ff922b",
+          10: "#fab005",
+          11: "#82c91e",
+          12: "#20c997",
+          13: "#339af0",
+          14: "#845ef7",
+          15: "#e599f7",
+          16: "#ff8787",
+          17: "#ffc078",
+          18: "#ffe066",
+          19: "#8ce99a",
+          20: "#63e6be",
+          21: "#74c0fc",
+          22: "#b197fc",
+          23: "#faa2c1",
+          24: "#ffa8a8",
+          25: "#ffec99",
+          26: "#c0eb75",
+          27: "#96f2d7",
+          28: "#a5d8ff",
+          29: "#d0bfff",
+          30: "#fcc2d7",
+          31: "#ff6b6b",
+          32: "#ffa94d",
+          33: "#ffd43b",
+          34: "#69db7c",
+          35: "#4dabf7",
+          36: "#9775fa",
+        };
+        const key = String(parseInt(value, 10));
+        return colorMap[key] || colorMap[value] || "#ff9f0a";
+      }
+
+      function normalizeExportSearchKey(rawValue, game) {
+        if (!rawValue) return "";
+        const value = rawValue.toString().trim();
+
+        if (game === "pw") {
+          return value.replace(/^0+/, "");
+        }
+
+        if (game === "p2") {
+          const nums = value
+            .split(/[,\/\s\-]+/)
+            .map((n) => n.trim())
+            .filter(Boolean)
+            .map((n) => String(parseInt(n, 10)).padStart(2, "0"));
+          if (nums.length !== 2) return value.replace(/\s+/g, ",");
+          return nums.sort().join(",");
+        }
+
+        if (game === "p4") {
+          return value
+            .replace(/\D/g, "")
+            .split("")
+            .sort()
+            .join("");
+        }
+
+        return value;
+      }
+
+      function highlightExportSearch(game) {
+        const input = document.getElementById(`exportSearchInput-${game}`);
+        const message = document.getElementById(`exportSearchMessage-${game}`);
+        const container = document.getElementById(`modalContent-${game}`);
+        if (!input || !container) return;
+
+        const rawValue = input.value.trim();
+        const normalized = normalizeExportSearchKey(rawValue, game);
+        if (!normalized) {
+          if (message) message.innerText = "Enter a valid search term.";
+          return;
+        }
+
+        let matchCount = 0;
+        container.querySelectorAll("[data-search]").forEach((cell) => {
+          const value = cell.getAttribute("data-search");
+          const div = cell.querySelector("div");
+          const span = cell.querySelector("span");
+          const isMatch = value === normalized;
+
+          if (isMatch) {
+            matchCount += 1;
+            cell.style.outline = "";
+            cell.style.outlineOffset = "";
+
+            if (game === "pw" && div) {
+              if (!("origDivBg" in cell.dataset)) {
+                cell.dataset.origDivBg = div.style.background || "";
+                cell.dataset.origDivColor = div.style.color || "";
+              }
+              div.style.background = getPlayWheSearchBallColor(normalized);
+              div.style.color = "#000";
+            }
+          } else {
+            cell.style.outline = "";
+            cell.style.outlineOffset = "";
+
+            if (game === "pw" && div && "origDivBg" in cell.dataset) {
+              div.style.background = cell.dataset.origDivBg;
+              div.style.color = cell.dataset.origDivColor || "";
+              delete cell.dataset.origDivBg;
+              delete cell.dataset.origDivColor;
+            }
+          }
+        });
+
+        if (message) {
+          message.innerText = "";
+        }
+      }
+
+      function clearExportSearch(game) {
+        const input = document.getElementById(`exportSearchInput-${game}`);
+        const message = document.getElementById(`exportSearchMessage-${game}`);
+        const container = document.getElementById(`modalContent-${game}`);
+        if (input) input.value = "";
+        if (message) message.innerText = "";
+        if (!container) return;
+
+        container.querySelectorAll("[data-search]").forEach((cell) => {
+          cell.style.outline = "";
+          cell.style.outlineOffset = "";
+
+          const div = cell.querySelector("div");
+          if (div && "origDivBg" in cell.dataset) {
+            div.style.background = cell.dataset.origDivBg;
+            div.style.color = cell.dataset.origDivColor || "";
+            delete cell.dataset.origDivBg;
+            delete cell.dataset.origDivColor;
+          }
+        });
       }
 
       // Add click handlers to game headers
