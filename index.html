@@ -1647,7 +1647,7 @@
     <div id="subscribeModal" class="subscribe-modal">
       <div class="subscribe-modal-content">
         <div class="subscribe-modal-header">
-          <h2>🇹🇹 Support CWG Charts Web App</h2>
+          <h2>🇹🇹 Support CWG Charts App</h2>
           <button class="subscribe-close" onclick="closeSubscribeModal()">
             &times;
           </button>
@@ -2328,7 +2328,7 @@
         container.style.fontFamily = "Arial, sans-serif";
 
         const headerHtml = `<div style="text-align:center; margin-bottom: 20px;">
-            <div style="font-size:18px; font-weight:800; color:#007AFF;">${gameName} Shelf-Lines-Suites Charts</div>
+            <div style="font-size:18px; font-weight:800; color:#007AFF;">${gameName} Shelf / Lines / Suites Charts</div>
             <div style="font-size:12px; color:#666; margin-top:6px;">Shelf Marks + Lines Played This Week + Suites Played This Week</div>
           </div>`;
 
@@ -2357,7 +2357,7 @@
         document.body.appendChild(container);
 
         try {
-          await captureElementAsImage(container, `${gameName}_SupportCharts`, "#ffffff");
+          await captureElementAsImage(container, `${gameName}_Shelf/Lines/Suites Charts`, "#ffffff");
         } finally {
           document.body.removeChild(container);
         }
