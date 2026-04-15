@@ -1953,9 +1953,14 @@
           spirit: 11,
           partner: 26,
           mirror: 26,
-          emoji: "🐦‍🔥",
+          emoji: "🦅",
         },
-        12: { name: "KING", spirit: 32, partner: 27, mirror: 25, emoji: "👑" },
+        12: { 
+          name: "KING", 
+          spirit: 32, 
+          partner: 27, 
+          mirror: 25, 
+          emoji: "🤴🏽" },
         13: {
           name: "CRAPAUD",
           spirit: 7,
@@ -1963,7 +1968,13 @@
           mirror: 24,
           emoji: "🐸",
         },
-        14: { name: "MONEY", spirit: 25, partner: 29, mirror: 23, emoji: "💰" },
+        14: { 
+          name: "MONEY", 
+          spirit: 25, 
+          partner: 29, 
+          mirror: 23, 
+          emoji: "💰" 
+        },
         15: {
           name: "SICK WOMAN",
           spirit: 9,
@@ -1983,7 +1994,7 @@
           spirit: 18,
           partner: 32,
           mirror: 20,
-          emoji: "🦜",
+          emoji: "🐦‍⬛",
         },
         18: {
           name: "WATER BOAT",
@@ -1992,12 +2003,48 @@
           mirror: 19,
           emoji: "🚤",
         },
-        19: { name: "HORSE", spirit: 5, partner: 34, mirror: 18, emoji: "🐎" },
-        20: { name: "DOG", spirit: 22, partner: 35, mirror: 17, emoji: "🐕" },
-        21: { name: "MOUTH", spirit: 23, partner: 36, mirror: 16, emoji: "👄" },
-        22: { name: "RAT", spirit: 20, partner: 1, mirror: 15, emoji: "🐀" },
-        23: { name: "HOUSE", spirit: 21, partner: 2, mirror: 14, emoji: "🏠" },
-        24: { name: "QUEEN", spirit: 2, partner: 3, mirror: 13, emoji: "👑" },
+        19: { 
+          name: "HORSE", 
+          spirit: 5, 
+          partner: 34, 
+          mirror: 18, 
+          emoji: "🐎" 
+        },
+        20: { 
+          name: "DOG", 
+          spirit: 22, 
+          partner: 35, 
+          mirror: 17, 
+          emoji: "🐕" 
+        },
+        21: { 
+          name: "MOUTH", 
+          spirit: 23, 
+          partner: 36, 
+          mirror: 16, 
+          emoji: "👄" 
+        },
+        22: { 
+          name: "RAT", 
+          spirit: 20, 
+          partner: 1, 
+          mirror: 15, 
+          emoji: "🐀" 
+        },
+        23: { 
+          name: "HOUSE", 
+          spirit: 21, 
+          partner: 2, 
+          mirror: 14, 
+          emoji: "🏠" 
+        },
+        24: { 
+          name: "QUEEN", 
+          spirit: 2, 
+          partner: 3, 
+          mirror: 13, 
+          emoji: "👑" 
+        },
         25: {
           name: "MOROCOY",
           spirit: 14,
@@ -2005,7 +2052,13 @@
           mirror: 12,
           emoji: "🐢",
         },
-        26: { name: "FOWL", spirit: 27, partner: 5, mirror: 11, emoji: "🐓" },
+        26: { 
+          name: "FOWL", 
+          spirit: 27, 
+          partner: 5, 
+          mirror: 11, 
+          emoji: "🐓" 
+        },
         27: {
           name: "LITTLE SNAKE",
           spirit: 16,
@@ -2013,7 +2066,13 @@
           mirror: 10,
           emoji: "🐍",
         },
-        28: { name: "FISH", spirit: 10, partner: 7, mirror: 9, emoji: "🐟" },
+        28: { 
+          name: "FISH", 
+          spirit: 10, 
+          partner: 7, 
+          mirror: 9, 
+          emoji: "🐟" 
+        },
         29: {
           name: "OPIUM MAN",
           spirit: 4,
@@ -2035,8 +2094,20 @@
           mirror: 6,
           emoji: "👰",
         },
-        32: { name: "SHRIMPS", spirit: 8, partner: 11, mirror: 5, emoji: "🦐" },
-        33: { name: "SPIDER", spirit: 26, partner: 12, mirror: 4, emoji: "🕷️" },
+        32: { 
+          name: "SHRIMPS", 
+          spirit: 8, 
+          partner: 11, 
+          mirror: 5, 
+          emoji: "🦐" 
+        },
+        33: { 
+          name: "SPIDER", 
+          spirit: 26, 
+          partner: 12, 
+          mirror: 4, 
+          emoji: "🕷️" 
+        },
         34: {
           name: "BLIND MAN",
           spirit: 31,
@@ -2051,7 +2122,13 @@
           mirror: 2,
           emoji: "🐍",
         },
-        36: { name: "DONKEY", spirit: 11, partner: 15, mirror: 1, emoji: "🫏" },
+        36: { 
+          name: "DONKEY", 
+          spirit: 11, 
+          partner: 15, 
+          mirror: 1, 
+          emoji: "🫏" 
+        },
       };
 
       // Mark colors for Play Whe
@@ -2335,18 +2412,18 @@
         let chartsHtml = "";
         if (game === "pw") {
           chartsHtml = `
-            <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:20px; margin-bottom:20px;">
+            <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:7px; margin-bottom:10px;">
               ${renderShelfMarksChart(historyWeeks, currentWeekDraws)}
-              <div style="display:flex; flex-direction:column; gap:20px;">
+              <div style="display:flex; flex-direction:column; gap:9px;">
                 ${renderLinesPlayedChart(currentWeekDraws)}
                 ${renderSuitesPlayedChart(currentWeekDraws)}
               </div>
             </div>`;
         } else {
           chartsHtml = `
-            <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:20px; margin-bottom:20px;">
+            <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:7px; margin-bottom:10px;">
               ${renderPick2ShelfMarksChart(historyWeeks, currentWeekDraws)}
-              <div style="display:flex; flex-direction:column; gap:20px;">
+              <div style="display:flex; flex-direction:column; gap:9px;">
                 ${renderPick2LinesPlayedChart(currentWeekDraws)}
                 ${renderPick2SuitesPlayedChart(currentWeekDraws)}
               </div>
@@ -2376,7 +2453,7 @@
         // Create a wrapper div for capturing with footer
         const captureContainer = document.createElement("div");
         captureContainer.style.backgroundColor = "white";
-        captureContainer.style.padding = "30px";
+        captureContainer.style.padding = "15px";
         captureContainer.style.display = "inline-block";
         captureContainer.style.width = "auto";
         captureContainer.style.minWidth = "800px";
@@ -2392,7 +2469,7 @@
         // Add branding header
         const header = document.createElement("div");
         header.style.textAlign = "center";
-        header.style.marginBottom = "20px";
+        header.style.marginBottom = "10px";
         header.style.fontSize = "16px";
         header.style.fontWeight = "bold";
         header.style.color = "#007AFF";
@@ -2401,7 +2478,7 @@
         // Add branding footer
         const footer = document.createElement("div");
         footer.style.textAlign = "center";
-        footer.style.marginTop = "20px";
+        footer.style.marginTop = "10px";
         footer.style.paddingTop = "10px";
         footer.style.borderTop = "2px solid #ccc";
         footer.style.fontSize = "10px";
@@ -2769,7 +2846,7 @@
           console.log("Auto-refreshing data...");
           await loadAllGames();
           await updateRealtimeDraws();
-        }, 60 * 1000);
+        }, 20 * 1000);
       }
 
       // ========== INITIALIZATION ==========
