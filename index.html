@@ -3265,8 +3265,15 @@
           previousWeekIndex -= 1;
         }
 
-        const previousWeek =
-          previousWeekIndex >= 0 ? weeks[previousWeekIndex] : null;
+        // We create a fresh date object based on "now"
+        const previewDateObj = new Date(); 
+        
+        // If the logic says we are showing "Tomorrow" (after 6:50 PM), 
+        // we shift the date object forward by 1 day
+        if (showNextDay) {
+          previewDateObj.setDate(previewDateObj.getDate() + 1);
+        }
+
         if (!previousWeek) {
           previewContent.textContent =
             "No previous week draws found for this day.";
@@ -3387,8 +3394,15 @@
           previousWeekIndex -= 1;
         }
 
-        const previousWeek =
-          previousWeekIndex >= 0 ? weeks[previousWeekIndex] : null;
+        // We create a fresh date object based on "now"
+        const previewDateObj = new Date(); 
+        
+        // If the logic says we are showing "Tomorrow" (after 6:50 PM), 
+        // we shift the date object forward by 1 day
+        if (showNextDay) {
+          previewDateObj.setDate(previewDateObj.getDate() + 1);
+        }
+
         if (!previousWeek) {
           previewContent.textContent =
             "No previous week draws found for this day.";
