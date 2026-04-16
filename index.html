@@ -3216,254 +3216,183 @@
       }
 
       function renderPick2PreviousWeekPreview() {
-        const previewContainer = document.getElementById("p2-realtime-preview");
-        const previewContent = document.getElementById(
-          "p2-realtime-preview-content",
-        );
-        if (!previewContainer || !previewContent) return;
-
-        const fullWeeks = gameState.pick2.fullWeeks || [];
-        if (fullWeeks.length < 2) {
-          previewContent.textContent = "Previous week preview unavailable";
-          previewContainer.dataset.copyText = "";
-          return;
-        }
-
-        const now = new Date();
-        const showNextDay =
-          now.getHours() > 18 ||
-          (now.getHours() === 18 && now.getMinutes() >= 50);
-        const previewDayIndex = showNextDay
-          ? (now.getDay() + 1) % 7
-          : now.getDay();
-        const previewDayName = dayNames[previewDayIndex];
-
-        const weeks = [...fullWeeks].reverse();
-        const currentWeekIndex = weeks.length - 1;
-        let previousWeekIndex = currentWeekIndex - 1;
-
-        const isHolidayDay = (day) => {
-          if (!day) return true;
-          return ["MOR", "MID", "NON", "EVE"].every((slot) => {
-            const val = day.draws[slot];
-            const text = typeof val === "string" ? val.trim().toUpperCase() : val;
-            return !text || text === "-" || text === "PENDING" || text === "HOLIDAY";
-          });
-        };
-
-        while (previousWeekIndex >= 0) {
-          const candidateWeek = weeks[previousWeekIndex];
-          const dayData = candidateWeek.days.find(
-            (d) => d.dayName === previewDayName,
-          );
-          if (!dayData) {
-            previousWeekIndex -= 1;
-            continue;
+          const previewContainer = document.getElementById("p2-realtime-preview");
+          const previewContent = document.getElementById("p2-realtime-preview-content");
+          if (!previewContainer || !previewContent) return;
+      
+          const fullWeeks = gameState.pick2.fullWeeks || [];
+          if (fullWeeks.length < 2) {
+              previewContent.textContent = "Previous week preview unavailable";
+              previewContainer.dataset.copyText = "";
+              return;
           }
-
-          if (!isHolidayDay(dayData)) break;
-          previousWeekIndex -= 1;
-        }
-
-        // We create a fresh date object based on "now"
-        const previewDateObj = new Date(); 
-        
-        // If the logic says we are showing "Tomorrow" (after 6:50 PM), 
-        // we shift the date object forward by 1 day
-        if (showNextDay) {
-          previewDateObj.setDate(previewDateObj.getDate() + 1);
-        }
-
-        if (!previousWeek) {
-          previewContent.textContent =
-            "No previous week draws found for this day.";
-          previewContainer.dataset.copyText = "";
-          return;
-        }
-
-        const dayData = previousWeek.days.find(
-          (d) => d.dayName === previewDayName,
-        );
-        if (!dayData) {
-          previewContent.textContent =
-            "No previous week draws found for this day.";
-          previewContainer.dataset.copyText = "";
-          return;
-        }
-
-        const previewDateObj = getDateForWeekDay(previousWeek, previewDayName);
-        const previewLabel = previewDateObj
-          ? formatShortDate(previewDateObj)
-          : `${previewDayName.slice(0, 3)}`;
-        const titleText = showNextDay
-          ? `What We're Coming Under Tomorrow<br/>(${previewLabel})`
-          : `What We're Coming Under Today<br/>(${previewLabel})`;
-
-        const headerSpan = previewContainer.querySelector(
-          ".realtime-preview-header span",
-        );
-        if (headerSpan) {
-          headerSpan.innerHTML = titleText;
-        }
-
-        const slotsOrder = ["MOR", "MID", "NON", "EVE"];
-
-        const previewValues = slotsOrder.map((slot) => {
-          const draw = dayData.draws[slot];
-          if (!draw || draw === "-" || draw === "PENDING") {
-            return {
-              display: "—",
-              text: "—",
-            };
-          }
-          const nums = String(draw).match(/\d{1,2}/g);
-          if (!nums || nums.length < 2) {
-            return {
-              display: draw,
-              text: draw,
-            };
-          }
-          const pair = nums.slice(0, 2).join("/");
-          return {
-            display: pair,
-            text: pair,
+      
+          const now = new Date();
+          const showNextDay = now.getHours() > 18 || (now.getHours() === 18 && now.getMinutes() >= 50);
+          const previewDayIndex = showNextDay ? (now.getDay() + 1) % 7 : now.getDay();
+          const previewDayName = dayNames[previewDayIndex];
+      
+          const weeks = [...fullWeeks].reverse();
+          const currentWeekIndex = weeks.length - 1;
+          let previousWeekIndex = currentWeekIndex - 1;
+      
+          const isHolidayDay = (day) => {
+              if (!day) return true;
+              return ["MOR", "MID", "NON", "EVE"].every((slot) => {
+                  const val = day.draws[slot];
+                  const text = typeof val === "string" ? val.trim().toUpperCase() : val;
+                  return !text || text === "-" || text === "PENDING" || text === "HOLIDAY";
+              });
           };
-        });
-
-        previewContent.innerHTML = [
-          `<span class="realtime-preview-chip realtime-preview-label">${previewLabel}</span>`,
-          ...previewValues.map(
-            (item) =>
-              `<span class="realtime-preview-chip">${item.display}</span>`,
-          ),
-        ].join("");
-
-        const copyText = `${previewLabel} : ${previewValues
-          .map((item) => item.text)
-          .join(" | ")}`;
-        previewContainer.dataset.copyText = copyText;
+      
+          while (previousWeekIndex >= 0) {
+              const candidateWeek = weeks[previousWeekIndex];
+              const dayData = candidateWeek.days.find((d) => d.dayName === previewDayName);
+              if (!dayData) {
+                  previousWeekIndex -= 1;
+                  continue;
+              }
+              if (!isHolidayDay(dayData)) break;
+              previousWeekIndex -= 1;
+          }
+      
+          const previousWeek = previousWeekIndex >= 0 ? weeks[previousWeekIndex] : null;
+          if (!previousWeek) {
+              previewContent.textContent = "No previous week draws found for this day.";
+              previewContainer.dataset.copyText = "";
+              return;
+          }
+      
+          const dayData = previousWeek.days.find((d) => d.dayName === previewDayName);
+          if (!dayData) {
+              previewContent.textContent = "No previous week draws found for this day.";
+              previewContainer.dataset.copyText = "";
+              return;
+          }
+      
+          // New Date Logic
+          const previewDateObj = new Date(); 
+          if (showNextDay) {
+              previewDateObj.setDate(previewDateObj.getDate() + 1);
+          }
+          const previewLabel = formatShortDate(previewDateObj);
+      
+          const titleText = showNextDay
+              ? `What We're Coming Under Tomorrow<br/>(${previewLabel})`
+              : `What We're Coming Under Today<br/>(${previewLabel})`;
+      
+          const headerSpan = previewContainer.querySelector(".realtime-preview-header span");
+          if (headerSpan) headerSpan.innerHTML = titleText;
+      
+          const slotsOrder = ["MOR", "MID", "NON", "EVE"];
+          const previewValues = slotsOrder.map((slot) => {
+              const draw = dayData.draws[slot];
+              if (!draw || draw === "-" || draw === "PENDING") {
+                  return { display: "—", text: "—" };
+              }
+              const nums = String(draw).match(/\d{1,2}/g);
+              if (!nums || nums.length < 2) {
+                  return { display: draw, text: draw };
+              }
+              const pair = nums.slice(0, 2).join("/");
+              return { display: pair, text: pair };
+          });
+      
+          previewContent.innerHTML = [
+              `<span class="realtime-preview-chip realtime-preview-label">${previewLabel}</span>`,
+              ...previewValues.map(item => `<span class="realtime-preview-chip">${item.display}</span>`)
+          ].join("");
+      
+          const copyText = `${previewLabel} : ${previewValues.map(item => item.text).join(" | ")}`;
+          previewContainer.dataset.copyText = copyText;
       }
-
+      
       function renderPick4PreviousWeekPreview() {
-        const previewContainer = document.getElementById("p4-realtime-preview");
-        const previewContent = document.getElementById(
-          "p4-realtime-preview-content",
-        );
-        if (!previewContainer || !previewContent) return;
-
-        const fullWeeks = gameState.pick4.fullWeeks || [];
-        if (fullWeeks.length < 2) {
-          previewContent.textContent = "Previous week preview unavailable";
-          previewContainer.dataset.copyText = "";
-          return;
-        }
-
-        const now = new Date();
-        const showNextDay =
-          now.getHours() > 18 ||
-          (now.getHours() === 18 && now.getMinutes() >= 50);
-        const previewDayIndex = showNextDay
-          ? (now.getDay() + 1) % 7
-          : now.getDay();
-        const previewDayName = dayNames[previewDayIndex];
-
-        const weeks = [...fullWeeks].reverse();
-        const currentWeekIndex = weeks.length - 1;
-        let previousWeekIndex = currentWeekIndex - 1;
-
-        const isHolidayDay = (day) => {
-          if (!day) return true;
-          return ["MOR", "MID", "NON", "EVE"].every((slot) => {
-            const val = day.draws[slot];
-            const text = typeof val === "string" ? val.trim().toUpperCase() : val;
-            return !text || text === "-" || text === "PENDING" || text === "HOLIDAY";
-          });
-        };
-
-        while (previousWeekIndex >= 0) {
-          const candidateWeek = weeks[previousWeekIndex];
-          const dayData = candidateWeek.days.find(
-            (d) => d.dayName === previewDayName,
-          );
-          if (!dayData) {
-            previousWeekIndex -= 1;
-            continue;
+          const previewContainer = document.getElementById("p4-realtime-preview");
+          const previewContent = document.getElementById("p4-realtime-preview-content");
+          if (!previewContainer || !previewContent) return;
+      
+          const fullWeeks = gameState.pick4.fullWeeks || [];
+          if (fullWeeks.length < 2) {
+              previewContent.textContent = "Previous week preview unavailable";
+              previewContainer.dataset.copyText = "";
+              return;
           }
-
-          if (!isHolidayDay(dayData)) break;
-          previousWeekIndex -= 1;
-        }
-
-        // We create a fresh date object based on "now"
-        const previewDateObj = new Date(); 
-        
-        // If the logic says we are showing "Tomorrow" (after 6:50 PM), 
-        // we shift the date object forward by 1 day
-        if (showNextDay) {
-          previewDateObj.setDate(previewDateObj.getDate() + 1);
-        }
-
-        if (!previousWeek) {
-          previewContent.textContent =
-            "No previous week draws found for this day.";
-          previewContainer.dataset.copyText = "";
-          return;
-        }
-
-        const dayData = previousWeek.days.find(
-          (d) => d.dayName === previewDayName,
-        );
-        if (!dayData) {
-          previewContent.textContent =
-            "No previous week draws found for this day.";
-          previewContainer.dataset.copyText = "";
-          return;
-        }
-
-        const previewDateObj = getDateForWeekDay(previousWeek, previewDayName);
-        const previewLabel = previewDateObj
-          ? formatShortDate(previewDateObj)
-          : `${previewDayName.slice(0, 3)}`;
-        const titleText = showNextDay
-          ? `What We're Coming Under Tomorrow<br/>(${previewLabel})`
-          : `What We're Coming Under Today<br/>(${previewLabel})`;
-
-        const headerSpan = previewContainer.querySelector(
-          ".realtime-preview-header span",
-        );
-        if (headerSpan) {
-          headerSpan.innerHTML = titleText;
-        }
-
-        const slotsOrder = ["MOR", "MID", "NON", "EVE"];
-
-        const previewValues = slotsOrder.map((slot) => {
-          const draw = dayData.draws[slot];
-          if (!draw || draw === "-" || draw === "PENDING") {
-            return {
-              display: "—",
-              text: "—",
-            };
-          }
-          const p4Number = draw.trim();
-          return {
-            display: p4Number,
-            text: p4Number,
+      
+          const now = new Date();
+          const showNextDay = now.getHours() > 18 || (now.getHours() === 18 && now.getMinutes() >= 50);
+          const previewDayIndex = showNextDay ? (now.getDay() + 1) % 7 : now.getDay();
+          const previewDayName = dayNames[previewDayIndex];
+      
+          const weeks = [...fullWeeks].reverse();
+          const currentWeekIndex = weeks.length - 1;
+          let previousWeekIndex = currentWeekIndex - 1;
+      
+          const isHolidayDay = (day) => {
+              if (!day) return true;
+              return ["MOR", "MID", "NON", "EVE"].every((slot) => {
+                  const val = day.draws[slot];
+                  const text = typeof val === "string" ? val.trim().toUpperCase() : val;
+                  return !text || text === "-" || text === "PENDING" || text === "HOLIDAY";
+              });
           };
-        });
-
-        previewContent.innerHTML = [
-          `<span class="realtime-preview-chip realtime-preview-label">${previewLabel}</span>`,
-          ...previewValues.map(
-            (item) =>
-              `<span class="realtime-preview-chip">${item.display}</span>`,
-          ),
-        ].join("");
-
-        const copyText = `${previewLabel} : ${previewValues
-          .map((item) => item.text)
-          .join(" | ")}`;
-        previewContainer.dataset.copyText = copyText;
+      
+          while (previousWeekIndex >= 0) {
+              const candidateWeek = weeks[previousWeekIndex];
+              const dayData = candidateWeek.days.find((d) => d.dayName === previewDayName);
+              if (!dayData) {
+                  previousWeekIndex -= 1;
+                  continue;
+              }
+              if (!isHolidayDay(dayData)) break;
+              previousWeekIndex -= 1;
+          }
+      
+          const previousWeek = previousWeekIndex >= 0 ? weeks[previousWeekIndex] : null;
+          if (!previousWeek) {
+              previewContent.textContent = "No previous week draws found for this day.";
+              previewContainer.dataset.copyText = "";
+              return;
+          }
+      
+          const dayData = previousWeek.days.find((d) => d.dayName === previewDayName);
+          if (!dayData) {
+              previewContent.textContent = "No previous week draws found for this day.";
+              previewContainer.dataset.copyText = "";
+              return;
+          }
+      
+          // New Date Logic
+          const previewDateObj = new Date(); 
+          if (showNextDay) {
+              previewDateObj.setDate(previewDateObj.getDate() + 1);
+          }
+          const previewLabel = formatShortDate(previewDateObj);
+      
+          const titleText = showNextDay
+              ? `What We're Coming Under Tomorrow<br/>(${previewLabel})`
+              : `What We're Coming Under Today<br/>(${previewLabel})`;
+      
+          const headerSpan = previewContainer.querySelector(".realtime-preview-header span");
+          if (headerSpan) headerSpan.innerHTML = titleText;
+      
+          const slotsOrder = ["MOR", "MID", "NON", "EVE"];
+          const previewValues = slotsOrder.map((slot) => {
+              const draw = dayData.draws[slot];
+              if (!draw || draw === "-" || draw === "PENDING") {
+                  return { display: "—", text: "—" };
+              }
+              const p4Number = draw.trim();
+              return { display: p4Number, text: p4Number };
+          });
+      
+          previewContent.innerHTML = [
+              `<span class="realtime-preview-chip realtime-preview-label">${previewLabel}</span>`,
+              ...previewValues.map(item => `<span class="realtime-preview-chip">${item.display}</span>`)
+          ].join("");
+      
+          const copyText = `${previewLabel} : ${previewValues.map(item => item.text).join(" | ")}`;
+          previewContainer.dataset.copyText = copyText;
       }
 
       function getDateForWeekDay(week, dayName) {
