@@ -51,7 +51,12 @@
         position: sticky;
         top: 0;
         z-index: 1000;
-        text-align: center;
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        text-align: left;
         margin-bottom: 20px;
         padding: 16px;
         background: linear-gradient(135deg, #1e293b, #0f172a);
@@ -65,6 +70,8 @@
       }
 
       .header h1 {
+        flex: 1 1 0;
+        min-width: 0;
         font-size: clamp(20px, 4vw, 32px);
         line-height: 1.1;
         font-weight: 800;
@@ -72,8 +79,46 @@
         -webkit-background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin-bottom: 8px;
+        margin: 0;
         white-space: normal;
+      }
+
+      .header-text {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 0;
+      }
+
+      .header-title-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 10px;
+      }
+
+      .header-title-row h1 {
+        margin: 0;
+        font-size: clamp(20px, 4vw, 32px);
+      }
+
+      .header-rotating-text {
+        display: inline-block;
+        font-size: clamp(16px, 2vw, 20px);
+        font-weight: 700;
+        opacity: 0;
+        transition: opacity 0.4s ease-in-out;
+      }
+
+      .header-rotating-text.visible {
+        opacity: 1;
+      }
+
+      .header-datetime {
+        display: inline-block;
+        font-size: 13px;
+        opacity: 0.85;
+        white-space: nowrap;
       }
 
       body.light-mode .header h1 {
@@ -291,7 +336,7 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        margin: 12px auto 0;
+        margin: 0;
         background: var(--accent-orange);
         border: none;
         border-radius: 30px;
@@ -299,6 +344,23 @@
         font-weight: bold;
         cursor: pointer;
         font-size: 14px;
+        white-space: nowrap;
+      }
+
+      @media (max-width: 640px) {
+        .header {
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+        }
+
+        .header h1 {
+          width: 100%;
+        }
+
+        .theme-btn {
+          margin-top: 6px;
+        }
       }
 
       @media (max-width: 1024px) {
@@ -1141,11 +1203,14 @@
   </head>
   <body>
     <div class="header">
-      <h1>
-        C.W.G. CHARTS <br />
-        PLAY WHE • PICK 2 • PICK 4
-      </h1>
-      <button class="theme-btn" onclick="toggleTheme()">🌓 Dark/Light</button>
+      <div class="header-text">
+        <div class="header-title-row">
+          <h1>C.W.G. CHARTS:</h1>
+          <span id="rotatingGameText" class="header-rotating-text visible">PLAY WHE</span>
+        </div>
+        <span id="headerDateTime" class="header-datetime">Loading...</span>
+      </div>
+      <span class="theme-btn" onclick="toggleTheme()">🌓</span>
     </div>
 
     <div class="dashboard-grid" id="dashboardGrid">
@@ -2212,6 +2277,33 @@
         return colors[index % colors.length];
       }
 
+      function trimNumericString(value) {
+        if (value === null || value === undefined) return value;
+        const text = String(value).trim();
+        const num = parseInt(text, 10);
+        return Number.isNaN(num) ? text : String(num);
+      }
+
+      function formatGameDrawValue(value, gameType) {
+        if (value === null || value === undefined) return value;
+        const text = String(value).trim();
+        if (text === "-" || text.toUpperCase() === "PENDING") return text;
+
+        if (gameType === "PLAY_WHE") {
+          return trimNumericString(text);
+        }
+
+        if (gameType === "PICK_2") {
+          const parts = text
+            .split(/[,\/\s\-]+/)
+            .map((part) => trimNumericString(part))
+            .filter(Boolean);
+          return parts.length ? parts.join("/") : text;
+        }
+
+        return text;
+      }
+
       function formatDateRange(week) {
         if (!week || !week.startDate) return "Date Range";
 
@@ -2752,7 +2844,7 @@
                         // - Otherwise show "-" or empty
                         let displayVal = "";
                         if (val && val !== "-" && val !== "PENDING") {
-                          displayVal = val;
+                          displayVal = formatGameDrawValue(val, gameType);
                         } else if (showPendingDots) {
                           displayVal = "...";
                         } else {
@@ -2854,14 +2946,14 @@
           "pick4-card": "PICK 4",
         };
         const gameName = cardMap[cardId] || "GAME";
-        const hoverLabel = `View Historical Charts — ${gameName}`;
+        const hoverLabel = `${gameName}<br>View Historical Charts`;
 
         // Preserve height to avoid layout jump when swapping text
         const originalHeight = title.getBoundingClientRect().height;
         title.style.minHeight = `${originalHeight}px`;
 
         header.addEventListener("mouseenter", () => {
-          title.textContent = hoverLabel;
+          title.innerHTML = hoverLabel;
           header.classList.add("hovered");
         });
 
@@ -2916,6 +3008,7 @@
         setupGameHeaderHover("playwhe-card");
         setupGameHeaderHover("pick2-card");
         setupGameHeaderHover("pick4-card");
+        startHeaderTicker();
 
         // Close modal when clicking outside
         window.addEventListener("click", (event) => {
@@ -2987,10 +3080,10 @@
               // Play Whe format: "31 👩‍💼 Parson Wife (SPB, MB)"
               const match = draw.numbers.match(/^(\d+)\s+(.+?)\s+\(([^)]+)\)$/);
               if (match) {
-                const num = match[1].padStart(2, "0");
+                const num = String(parseInt(match[1], 10));
                 const spirit = match[2];
                 const marks = match[3].split(",").map((m) => m.trim());
-                const color = numberColors[num] || "#ffffff";
+                const color = numberColors[num.padStart(2, "0")] || "#ffffff";
 
                 html += '<div class="numbers">';
                 html += `<span class="realtime-number" style="background:${color}">${num}</span>`;
@@ -3194,7 +3287,7 @@
             .toString()
             .trim()
             .match(/^(\d{1,2})/);
-          const numText = match ? match[1].padStart(2, "0") : draw;
+          const numText = match ? String(parseInt(match[1], 10)) : draw;
           const emoji = playWheMasterData[parseInt(numText, 10)]?.emoji || "";
           return {
             display: `${numText}${emoji}`,
@@ -3295,7 +3388,12 @@
               if (!nums || nums.length < 2) {
                   return { display: draw, text: draw };
               }
-              const pair = nums.slice(0, 2).join("/");
+              const pair = nums
+                .slice(0, 2)
+                .map((n) => parseInt(n, 10))
+                .filter((n) => !Number.isNaN(n))
+                .map((n) => String(n))
+                .join("/");
               return { display: pair, text: pair };
           });
       
@@ -3445,6 +3543,50 @@
         return `${dayNamesShort[date.getDay()]} ${String(
           date.getDate(),
         ).padStart(2, "0")} ${monthNames[date.getMonth()]}`;
+      }
+
+      const rotatingHeaderTexts = ["PLAY WHE", "PICK 2", "PICK 4"];
+      let rotatingHeaderIndex = 0;
+
+      function updateHeaderRotation() {
+        const headerText = document.getElementById("rotatingGameText");
+        if (!headerText) return;
+        headerText.classList.remove("visible");
+        setTimeout(() => {
+          rotatingHeaderIndex =
+            (rotatingHeaderIndex + 1) % rotatingHeaderTexts.length;
+          headerText.textContent = rotatingHeaderTexts[rotatingHeaderIndex];
+          headerText.classList.add("visible");
+        }, 400);
+      }
+
+      function updateHeaderDateTime() {
+        const dateTimeEl = document.getElementById("headerDateTime");
+        if (!dateTimeEl) return;
+        const now = new Date();
+        const dateText = now.toLocaleDateString(undefined, {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+        const timeText = now.toLocaleTimeString(undefined, {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        });
+        dateTimeEl.textContent = `${dateText} · ${timeText}`;
+      }
+
+      function startHeaderTicker() {
+        const rotatingText = document.getElementById("rotatingGameText");
+        if (rotatingText) {
+          rotatingText.textContent = rotatingHeaderTexts[0];
+          rotatingText.classList.add("visible");
+        }
+        updateHeaderDateTime();
+        setInterval(updateHeaderDateTime, 1000);
+        setInterval(updateHeaderRotation, 4000);
       }
 
       function buildAnalyzerTimelines() {
@@ -4424,6 +4566,10 @@
           const isHit = currentWeekDraws.includes(num);
           const highlightColor = highlightColors[numStr] || "#ffffff";
 
+          const spiritText = trimNumericString(data.spirit);
+          const partnerText = trimNumericString(data.partner);
+          const mirrorText = trimNumericString(data.mirror);
+
           const rowStyle = `display:flex; align-items:center; gap:10px; padding:8px; border-radius:12px; background:#ffffff; border:${isHit ? "2px solid #4472c4" : "1px solid #ddd"}; box-shadow: 0 1px 3px rgba(0,0,0,0.06);`;
           const numberStyle = `width:34px; height:34px; min-width:34px; border-radius:50%; background:${numberColors[numStr] || "#ffffff"}; display:flex; align-items:center; justify-content:center; font-weight:800; color:#000; ${isActive ? `box-shadow: 0 0 0 3px ${highlightColor};` : ``}`;
 
@@ -4432,9 +4578,9 @@
               <div style="flex:1; min-width:0;">
                 <div style="font-size:13px; font-weight:700; color:#111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${data.name}</div>
                 <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:4px; font-size:11px; color:#111;">
-                  <span style="background:#eef4ff; color:#1d3c7b; border-radius:999px; padding:2px 6px;">S:${String(data.spirit).padStart(2, "0")}</span>
-                  <span style="background:#fff4e6; color:#7a5200; border-radius:999px; padding:2px 6px;">P:${String(data.partner).padStart(2, "0")}</span>
-                  <span style="background:#f3f3f3; color:#333; border-radius:999px; padding:2px 6px;">M:${String(data.mirror).padStart(2, "0")}</span>
+                  <span style="background:#eef4ff; color:#1d3c7b; border-radius:999px; padding:2px 6px;">S:${spiritText}</span>
+                  <span style="background:#fff4e6; color:#7a5200; border-radius:999px; padding:2px 6px;">P:${partnerText}</span>
+                  <span style="background:#f3f3f3; color:#333; border-radius:999px; padding:2px 6px;">M:${mirrorText}</span>
                 </div>
               </div>
             </div>`;
@@ -5120,8 +5266,14 @@
 
                 let displayVal = valStr;
                 if (hasValue) {
-                  if (game === "p2") {
-                    const nums = valStr.split(/[,\/-]/).map((n) => n.trim());
+                  if (game === "pw") {
+                    displayVal = trimNumericString(valStr);
+                  } else if (game === "p2") {
+                    const nums = valStr
+                      .split(/[,\/-]/)
+                      .map((n) => parseInt(n.trim(), 10))
+                      .filter((n) => !Number.isNaN(n))
+                      .map((n) => String(n));
                     displayVal = nums.join(",");
                   } else if (game === "p4") {
                     displayVal = valStr.padStart(4, "0");
