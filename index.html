@@ -2564,113 +2564,111 @@
       }
 
       // Download History Table - capture the history table in landscape mode
-      async function downloadHistoryTable(game) {
-        const modalContent = document.getElementById(`modalContent-${game}`);
-        const exportTable = modalContent.querySelector(".export-table");
+// Download History Table - High Resolution Landscape Capture
+async function downloadHistoryTable(game) {
+  const modalContent = document.getElementById(`modalContent-${game}`);
+  const exportTable = modalContent?.querySelector(".export-table");
 
-        if (!exportTable) {
-          console.error("Export table not found");
-          return;
-        }
+  if (!exportTable) {
+    console.error("Export table not found");
+    return;
+  }
 
-        // Create a wrapper div for capturing with footer
-        const captureContainer = document.createElement("div");
-        captureContainer.style.backgroundColor = "white";
-        captureContainer.style.padding = "15px";
-        captureContainer.style.display = "inline-block";
-        captureContainer.style.width = "auto";
-        captureContainer.style.minWidth = "800px";
+  // 1. Create a high-quality wrapper
+  const captureContainer = document.createElement("div");
+  captureContainer.style.cssText = `
+    background-color: white;
+    padding: 30px;
+    display: inline-block;
+    width: 1200px; 
+    position: fixed;
+    top: -9999px;
+    left: -9999px;
+    box-sizing: border-box;
+  `;
 
-        // Clone the table
-        const tableClone = exportTable.cloneNode(true);
-        tableClone.style.width = "100%";
-        tableClone.style.borderCollapse = "collapse";
-        tableClone.style.fontSize = "10px";
-        tableClone.style.fontFamily = "'Helvetica Neue', Arial, sans-serif";
-        tableClone.style.lineHeight = "18px";
+  // 2. Clone and Style the Table for Print/Export
+  const tableClone = exportTable.cloneNode(true);
+  tableClone.style.width = "100%";
+  tableClone.style.borderCollapse = "collapse";
+  tableClone.style.fontSize = "12px"; // Slightly larger for better legibility
+  tableClone.style.fontFamily = "'Helvetica Neue', Arial, sans-serif";
+  tableClone.style.color = "#333";
 
-        // Add branding header
-        const header = document.createElement("div");
-        header.style.textAlign = "center";
-        header.style.marginBottom = "10px";
-        header.style.fontSize = "16px";
-        header.style.fontWeight = "bold";
-        header.style.color = "#007AFF";
-        header.innerHTML = `${game === "pw" ? "PLAY WHE" : game === "p2" ? "PICK 2" : "PICK 4"} DRAW CHART<br>${document.getElementById(`modalDateRange-${game}`)?.innerText || ""}`;
+  // 3. Branding Header
+  const header = document.createElement("div");
+  header.style.cssText = "text-align: center; margin-bottom: 20px; font-family: sans-serif;";
+  const dateRange = document.getElementById(`modalDateRange-${game}`)?.innerText || "";
+  header.innerHTML = `
+    <div style="font-size: 22px; font-weight: bold; color: #007AFF; text-transform: uppercase;">
+      ${game === "pw" ? "PLAY WHE" : game === "p2" ? "PICK 2" : "PICK 4"} DRAW CHART
+    </div>
+    <div style="font-size: 14px; color: #555; margin-top: 5px;">${dateRange}</div>
+  `;
 
-        // Add branding footer
-        const footer = document.createElement("div");
-        footer.style.textAlign = "center";
-        footer.style.marginTop = "10px";
-        footer.style.paddingTop = "10px";
-        footer.style.borderTop = "2px solid #ccc";
-        footer.style.fontSize = "10px";
-        footer.style.color = "#666";
-        footer.innerHTML =
-          "© 2026 FINFOLIO SUITE PROJECTS • CODEWITHGLASGOW ANALYSIS";
+  // 4. Branding Footer
+  const footer = document.createElement("div");
+  footer.style.cssText = `
+    text-align: center; 
+    margin-top: 20px; 
+    padding-top: 15px; 
+    border-top: 1px solid #eee; 
+    font-size: 11px; 
+    color: #888; 
+    font-family: sans-serif;
+  `;
+  footer.innerHTML = "© 2026 FINFOLIO SUITE PROJECTS • CODEWITHGLASGOW ANALYSIS";
 
-        captureContainer.appendChild(header);
-        captureContainer.appendChild(tableClone);
-        captureContainer.appendChild(footer);
+  captureContainer.appendChild(header);
+  captureContainer.appendChild(tableClone);
+  captureContainer.appendChild(footer);
+  document.body.appendChild(captureContainer);
 
-        // Temporarily add to body for capturing
-        captureContainer.style.position = "fixed";
-        captureContainer.style.top = "-9999px";
-        captureContainer.style.left = "-9999px";
-        document.body.appendChild(captureContainer);
+  // Button UI State
+  const btn = event?.currentTarget;
+  let originalIcon = "";
+  if (btn) {
+    originalIcon = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating HD Image...';
+    btn.disabled = true;
+  }
 
-        const btn = event?.currentTarget;
-        let originalIcon = "";
-        if (btn) {
-          originalIcon = btn.innerHTML;
-          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-          btn.disabled = true;
-        }
-
-        try {
-          // Force landscape orientation by setting width > height
-          const containerWidth = captureContainer.scrollWidth;
-          const containerHeight = captureContainer.scrollHeight;
-
-          // Calculate scale to fit in a landscape image (width > height)
-          const targetWidth = Math.max(containerWidth, 1920);
-          const scale = targetWidth / containerWidth;
-
-          const canvas = await html2canvas(captureContainer, {
-            backgroundColor: "#ffffff",
-            scale: scale,
-            logging: false,
-            useCORS: true,
-            windowWidth: containerWidth,
-            windowHeight: containerHeight,
-            onclone: (clonedDoc, element) => {
-              // Ensure cloned element has proper styling
-              element.style.width = `${containerWidth}px`;
-            },
-          });
-
-          // Create download link
-          const link = document.createElement("a");
-          const timestamp = new Date()
-            .toISOString()
-            .slice(0, 19)
-            .replace(/:/g, "-");
-          const gameName =
-            game === "pw" ? "PlayWhe" : game === "p2" ? "Pick2" : "Pick4";
-          link.download = `${gameName}_Historical_Chart_${timestamp}.png`;
-          link.href = canvas.toDataURL("image/png");
-          link.click();
-        } catch (err) {
-          console.error("Capture failed:", err);
-          alert("Failed to capture image. Please try again.");
-        } finally {
-          document.body.removeChild(captureContainer);
-          if (btn) {
-            btn.innerHTML = originalIcon;
-            btn.disabled = false;
-          }
-        }
+  try {
+    // 5. Advanced Canvas Configuration
+    const canvas = await html2canvas(captureContainer, {
+      backgroundColor: "#ffffff",
+      scale: 3,           // Triple the resolution for crispness
+      useCORS: true,      // Fixes potential cross-origin image issues
+      logging: false,
+      width: 1200,        // Force width to ensure landscape
+      onclone: (clonedDoc) => {
+        // Ensure all images/icons inside the clone are visible
+        const images = clonedDoc.getElementsByTagName('img');
+        for (let img of images) img.style.display = 'block';
       }
+    });
+
+    // 6. Download Logic
+    const timestamp = new Date().toISOString().split('T')[0];
+    const gameName = game === "pw" ? "PlayWhe" : game === "p2" ? "Pick2" : "Pick4";
+    
+    const link = document.createElement("a");
+    link.download = `${gameName}_Analysis_${timestamp}.png`;
+    link.href = canvas.toDataURL("image/png", 1.0); // 1.0 = Max Quality
+    link.click();
+
+  } catch (err) {
+    console.error("Capture failed:", err);
+    alert("Quality capture failed. Please ensure you are using a modern browser.");
+  } finally {
+    document.body.removeChild(captureContainer);
+    if (btn) {
+      btn.innerHTML = originalIcon;
+      btn.disabled = false;
+    }
+  }
+}
+
 
       // Subscribe Modal Functions
       function openSubscribeModal() {
