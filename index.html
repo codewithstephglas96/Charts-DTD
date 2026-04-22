@@ -1866,6 +1866,10 @@
         if (!response.ok) {
           throw new Error(`Network error ${response.status}`);
         }
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          throw new Error(`Expected JSON but got ${contentType}`);
+        }
         return response.json();
       }
 
@@ -1898,7 +1902,13 @@
         try {
           const data = await fetchJson(`${url}&_t=${Date.now()}`);
           setCache(cacheKey, data);
-          processGameData(gameKey, data);
+          // Pass 'false' to ONLY update state, not re-render the UI
+          processGameData(gameKey, data, false);
+          
+          // Optional: Re-render only if the new data has a different number of weeks
+          const shortKey = gameKey === "playwhe" ? "pw" : gameKey === "pick2" ? "p2" : "p4";
+          renderGameUI(shortKey);
+          
         } catch (error) {
           console.warn(`Background refresh failed for ${gameKey}:`, error);
         }
@@ -1911,11 +1921,13 @@
 
         if (cached && cached.data) {
           try {
-            processGameData(gameKey, cached.data);
+            // Process and render the cached data immediately
+            processGameData(gameKey, cached.data, true); // 'true' renders the UI
           } catch (error) {
             console.warn(`Cached data invalid for ${gameKey}:`, error);
           }
 
+          // Refresh in background (will update cache but not re-render immediately)
           refreshGameData(gameKey, url, cacheKey);
           return;
         }
@@ -2916,6 +2928,17 @@
         const currentWeekIndex = allWeeks.findIndex(wk => wk.isCurrentWeek);
         const currentWeek = allWeeks[currentWeekIndex];
         
+        // ========== CALCULATE HIGHLIGHT VALUES ONCE (based on current week) ==========
+        // Determine if evening draw has passed for current day highlighting
+        let isAfterEvening = false;
+        if (currentWeek) {
+          const todayData = currentWeek.days.find(d => d.dayName === todayName);
+          if (todayData && todayData.draws.EVE !== "-" && todayData.draws.EVE !== "PENDING") {
+            isAfterEvening = true;
+          }
+        }
+        let highlightDayName = isAfterEvening ? dayNames[(today.getDay() + 1) % 7] : todayName;
+        
         // Get previous weeks (excluding current week)
         const previousWeeks = allWeeks.filter((_, idx) => idx !== currentWeekIndex);
         
@@ -2974,9 +2997,12 @@
                   </div>
                 </div>
               </div>
-              ${buildSingleWeekTable(previousWeekToShow, gameType, game)}
+              ${buildSingleWeekTable(previousWeekToShow, gameType, game, isAfterEvening, highlightDayName)}
             </div>
           `;
+          
+          // Add branding separator
+          html += '<div style="text-align:center; padding:2px; opacity:0.1; font-weight:900; letter-spacing:8px; font-size:10px; margin: 10px 0;">CODEWITHGLASGOW</div>';
         } else {
           // No previous weeks available
           html += `
@@ -2993,13 +3019,13 @@
         
         // Show current week (always visible, no navigation on this one)
         html += `
-          <div style="margin-top: ${previousWeekToShow ? '20px' : '0'};">
+          <div style="margin-top: 0;">
             <div class="table-wrapper">
               <div class="table-header">
                 <span>📅 CURRENT WEEK</span>
                 <span style="font-size: 12px; opacity: 0.8;">${formatDateRange(currentWeek)}</span>
               </div>
-              ${buildSingleWeekTable(currentWeek, gameType, game)}
+              ${buildSingleWeekTable(currentWeek, gameType, game, isAfterEvening, highlightDayName)}
             </div>
           </div>
         `;
@@ -3036,7 +3062,7 @@
       }
 
       // Helper function to build a single week table
-      function buildSingleWeekTable(week, gameType, gameId) {
+      function buildSingleWeekTable(week, gameType, gameId, isAfterEveningGlobal, highlightDayNameGlobal) {
         const isPickGame = gameType === "PICK_2" || gameType === "PICK_4";
         let drawCounts = {}, colorMap = {}, colorIndex = 0;
         
@@ -3055,17 +3081,8 @@
           });
         }
         
-        // Get today's info for highlighting
+        // Get today's date for comparison
         const now = new Date();
-        const todayNameLocal = dayNames[now.getDay()];
-        let isAfterEvening = false;
-        if (week.isCurrentWeek) {
-          const todayData = week.days.find(d => d.dayName === todayNameLocal);
-          if (todayData && todayData.draws.EVE !== "-" && todayData.draws.EVE !== "PENDING") {
-            isAfterEvening = true;
-          }
-        }
-        let highlightDayName = isAfterEvening ? dayNames[(now.getDay() + 1) % 7] : todayNameLocal;
         const todayDateStr = now.toDateString();
         
         // Get actual date for each day
@@ -3089,9 +3106,10 @@
                 const isToday = actualDate.toDateString() === todayDateStr;
                 const isFutureDate = actualDate > now;
                 
-                let isHighlighted = d.dayName === highlightDayName;
+                let isHighlighted = d.dayName === highlightDayNameGlobal;
                 let dayLabel = d.dayName.slice(0, 3).toUpperCase();
-                if (isHighlighted && isAfterEvening && week.isCurrentWeek) {
+                // Only show arrow for current week (matches original behavior)
+                if (isHighlighted && isAfterEveningGlobal && week.isCurrentWeek) {
                   dayLabel = "▶ " + dayLabel;
                 }
                 
@@ -3104,9 +3122,13 @@
                 let showPendingDots = false;
                 
                 if (hasNoDraws) {
-                  if (!week.isCurrentWeek) showHoliday = true;
-                  else if (week.isCurrentWeek && isPastDate) showHoliday = true;
-                  else if (week.isCurrentWeek && (isToday || isFutureDate)) showPendingDots = true;
+                  if (!week.isCurrentWeek) {
+                    showHoliday = true;
+                  } else if (week.isCurrentWeek && isPastDate) {
+                    showHoliday = true;
+                  } else if (week.isCurrentWeek && (isToday || isFutureDate)) {
+                    showPendingDots = true;
+                  }
                 }
                 
                 return `<tr class="${isHighlighted ? "current-day" : ""}">
