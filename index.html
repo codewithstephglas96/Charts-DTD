@@ -1221,6 +1221,161 @@
         font-weight: bold;
         color: #ff375f !important;
       }
+
+      /* Swipeable Stats Container */
+      .stats-swipe-container {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        margin: 20px 0;
+      }
+
+      .stats-swipe-wrapper {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        gap: 16px;
+        padding: 4px 0 16px 0;
+      }
+
+      .stats-swipe-wrapper::-webkit-scrollbar {
+        height: 6px;
+      }
+
+      .stats-swipe-wrapper::-webkit-scrollbar-track {
+        background: #2d2d2d;
+        border-radius: 10px;
+      }
+
+      .stats-swipe-wrapper::-webkit-scrollbar-thumb {
+        background: #ff9d00;
+        border-radius: 10px;
+      }
+
+      .stats-card {
+        flex: 0 0 calc(33.333% - 11px);
+        min-width: 280px;
+        scroll-snap-align: start;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        overflow: hidden;
+        transition: transform 0.2s ease;
+      }
+
+      .stats-card:hover {
+        transform: translateY(-2px);
+      }
+
+      .stats-card-header {
+        background: linear-gradient(135deg, #1e3a8a, #1e40af);
+        padding: 12px;
+        text-align: center;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .stats-card-header h4 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 800;
+        color: #ff9d00;
+      }
+
+      .stats-card-header p {
+        margin: 4px 0 0;
+        font-size: 10px;
+        color: #888;
+      }
+
+      .stats-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+      }
+
+      .stats-table th {
+        background: rgba(0, 0, 0, 0.2);
+        padding: 8px 4px;
+        text-align: center;
+        font-weight: 700;
+        color: var(--accent-orange);
+      }
+
+      .stats-table td {
+        padding: 6px 4px;
+        text-align: center;
+        border-bottom: 1px solid var(--border-color);
+        font-weight: 600;
+      }
+
+      .stats-rank-1 {
+        background: rgba(255, 215, 0, 0.2);
+        font-weight: 800;
+      }
+
+      .stats-rank-2 {
+        background: rgba(192, 192, 192, 0.15);
+      }
+
+      .stats-rank-3 {
+        background: rgba(205, 127, 50, 0.15);
+      }
+
+      .stats-nav {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 12px;
+      }
+
+      .stats-nav-btn {
+        background: var(--accent-orange);
+        border: none;
+        border-radius: 20px;
+        padding: 6px 16px;
+        font-size: 11px;
+        font-weight: bold;
+        cursor: pointer;
+        color: #000;
+        transition: all 0.2s ease;
+      }
+
+      .stats-nav-btn:hover {
+        transform: scale(1.05);
+        opacity: 0.9;
+      }
+
+      .stats-indicators {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .stats-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #555;
+        transition: all 0.2s ease;
+      }
+
+      .stats-dot.active {
+        background: #ff9d00;
+        width: 20px;
+        border-radius: 4px;
+      }
+
+      @media (max-width: 768px) {
+        .stats-card {
+          flex: 0 0 calc(100% - 20px);
+          min-width: 280px;
+        }
+      }
+
     </style>
     <!-- Add html2canvas library -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -6341,6 +6496,574 @@
         return html;
       }
 
+      // ========== MONTHLY STATS FUNCTIONS WITH ENHANCED INTELLIGENCE ==========
+
+      // Get current month and previous month info
+      function getMonthRanges() {
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth();
+        
+        // Current month range
+        const currentMonthStart = new Date(currentYear, currentMonth, 1);
+        const currentMonthEnd = new Date(currentYear, currentMonth + 1, 0);
+        
+        // Previous month range
+        const prevMonthStart = new Date(currentYear, currentMonth - 1, 1);
+        const prevMonthEnd = new Date(currentYear, currentMonth, 0);
+        
+        return {
+          current: { start: currentMonthStart, end: currentMonthEnd, name: currentMonthStart.toLocaleString('default', { month: 'long', year: 'numeric' }) },
+          previous: { start: prevMonthStart, end: prevMonthEnd, name: prevMonthStart.toLocaleString('default', { month: 'long', year: 'numeric' }) }
+        };
+      }
+
+      // Build timeline for stats (using full weeks data - up to 24 weeks for accuracy)
+      function buildStatsTimeline(weeks, maxWeeks = 24) {
+        const timeline = [];
+        const timeOrderLocal = ["MOR", "MID", "NON", "EVE"];
+        const monthMap = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
+        
+        // Use only the last maxWeeks weeks for better accuracy
+        const recentWeeks = weeks.slice(-maxWeeks);
+        
+        recentWeeks.forEach(week => {
+          const parts = week.startDate.split(" ");
+          if (parts.length < 3) return;
+          
+          const startDay = parseInt(parts[0]);
+          const startMonth = parts[1];
+          const year = parseInt(parts[2]);
+          const weekStart = new Date(year, monthMap[startMonth], startDay);
+          
+          week.days.forEach((day, dayIdx) => {
+            const actualDate = new Date(weekStart);
+            actualDate.setDate(weekStart.getDate() + dayIdx);
+            
+            timeOrderLocal.forEach(slot => {
+              const draw = day.draws[slot];
+              if (draw && draw !== "-" && draw !== "PENDING") {
+                const numMatch = String(draw).match(/^(\d+)/);
+                if (numMatch) {
+                  const num = parseInt(numMatch[1], 10);
+                  if (!isNaN(num) && num >= 1 && num <= 36) {
+                    timeline.push({
+                      n: num,
+                      date: actualDate,
+                      dateStr: actualDate.toISOString().split('T')[0],
+                      timeSlot: slot,
+                      dayName: day.dayName
+                    });
+                  }
+                }
+              }
+            });
+          });
+        });
+        
+        return timeline;
+      }
+
+      // Calculate average gap for a number from full timeline
+      function calculateAverageGap(timeline, num) {
+        const draws = timeline.filter(d => d.n === num);
+        if (draws.length < 2) return 14; // Default average gap
+        
+        let totalGap = 0;
+        for (let i = 1; i < draws.length; i++) {
+          const gap = Math.floor((draws[i].date - draws[i-1].date) / (1000 * 60 * 60 * 24));
+          totalGap += gap;
+        }
+        return Math.round(totalGap / (draws.length - 1));
+      }
+
+      // Calculate confidence score (0-100%) based on days since last hit vs average gap
+      function calculateConfidence(daysSince, avgGap) {
+        if (daysSince === 0) return 0; // Just hit today
+        if (avgGap === 0) return 50;
+        const ratio = daysSince / avgGap;
+        if (ratio >= 2) return Math.min(100, Math.round(ratio * 50));
+        if (ratio >= 1.5) return Math.min(95, Math.round(70 + (ratio - 1.5) * 50));
+        if (ratio >= 1) return Math.min(85, Math.round(50 + (ratio - 1) * 40));
+        return Math.min(49, Math.round(ratio * 50));
+      }
+
+      // Get status label and emoji based on confidence
+      function getStatus(confidence, daysSince, avgGap) {
+        if (daysSince > avgGap * 1.5) return { label: "DUE NOW", emoji: "🔥", color: "#ff453a" };
+        if (daysSince > avgGap * 1.2) return { label: "HEATING UP", emoji: "♨️", color: "#ff9f0a" };
+        if (daysSince > avgGap * 0.8) return { label: "WATCHING", emoji: "👀", color: "#ffd60a" };
+        if (daysSince > avgGap * 0.5) return { label: "MONITORING", emoji: "📊", color: "#58a6ff" };
+        return { label: "RECENT", emoji: "✅", color: "#32d74b" };
+      }
+
+      // Get line and suite combined
+      function getLineSuite(num) {
+        const line = getLineForNumber(num);
+        const suite = getSuiteForNumber(num);
+        return `${line} Line / ${suite} Suite`;
+      }
+
+      // Get line number for a given number (1-36)
+      function getLineForNumber(num) {
+        const lines = {
+          1: [1, 10, 19, 28], 2: [2, 11, 20, 29], 3: [3, 12, 21, 30],
+          4: [4, 13, 22, 31], 5: [5, 14, 23, 32], 6: [6, 15, 24, 33],
+          7: [7, 16, 25, 34], 8: [8, 17, 26, 35], 9: [9, 18, 27, 36]
+        };
+        for (const [line, nums] of Object.entries(lines)) {
+          if (nums.includes(num)) return parseInt(line);
+        }
+        return 0;
+      }
+
+      // Get suite number for a given number (1-36)
+      function getSuiteForNumber(num) {
+        const suites = {
+          1: [1, 11, 21, 31], 2: [2, 12, 22, 32], 3: [3, 13, 23, 33],
+          4: [4, 14, 24, 34], 5: [5, 15, 25, 35], 6: [6, 16, 26, 36],
+          7: [7, 17, 27], 8: [8, 18, 28], 9: [9, 19, 29], 0: [10, 20, 30]
+        };
+        for (const [suite, nums] of Object.entries(suites)) {
+          if (nums.includes(num)) return suite === "0" ? 0 : parseInt(suite);
+        }
+        return 0;
+      }
+
+      // Get spirit name for a number
+      function getSpiritName(num) {
+        return playWheMasterData[num]?.name || "Unknown";
+      }
+
+     // Format last played date (relative - for table cards)
+    function formatLastPlayed(date) {
+      if (!date) return "Never";
+      const now = new Date();
+      const daysAgo = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+      if (daysAgo === 0) return "Today";
+      if (daysAgo === 1) return "Yesterday";
+      return `${daysAgo}d`;
+    }
+
+    // Format last played date as "Day Name # Month Year" (for Analytics Insight card)
+    function formatLastPlayedFull(date) {
+      if (!date) return "Never";
+      const options = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
+      return date.toLocaleDateString('en-US', options);
+    }
+
+      // Get full stats with 24-week timeline for analytics
+      function getFullAnalyticsStats(weeks) {
+        // Use 24 weeks of data for accurate confidence scoring
+        const fullTimeline = buildStatsTimeline(weeks, 24);
+        
+        if (fullTimeline.length === 0) {
+          return [];
+        }
+        
+        // Calculate days since last hit
+        const daysSinceLastHit = {};
+        for (let i = 1; i <= 36; i++) {
+          const lastGlobalDraw = [...fullTimeline].reverse().find(d => d.n === i);
+          if (lastGlobalDraw) {
+            const today = new Date();
+            daysSinceLastHit[i] = Math.floor((today - lastGlobalDraw.date) / (1000 * 60 * 60 * 24));
+          } else {
+            daysSinceLastHit[i] = 99; // Never played
+          }
+        }
+        
+        // Calculate average gaps for confidence
+        const avgGaps = {};
+        for (let i = 1; i <= 36; i++) {
+          avgGaps[i] = calculateAverageGap(fullTimeline, i);
+        }
+        
+        // Calculate total frequency
+        const totalFrequency = {};
+        for (let i = 1; i <= 36; i++) {
+          totalFrequency[i] = fullTimeline.filter(d => d.n === i).length;
+        }
+        
+        // Get last played info from full timeline
+        const lastPlayed = {};
+        const lastTimeSlot = {};
+        const lastDayName = {};
+        for (let i = 1; i <= 36; i++) {
+          const lastDraw = [...fullTimeline].reverse().find(d => d.n === i);
+          if (lastDraw) {
+            lastPlayed[i] = lastDraw.date;
+            lastTimeSlot[i] = lastDraw.timeSlot;
+            lastDayName[i] = lastDraw.dayName;
+          } else {
+            lastPlayed[i] = null;
+            lastTimeSlot[i] = null;
+            lastDayName[i] = null;
+          }
+        }
+        
+        // Create array of number stats
+        const numberStats = [];
+        for (let i = 1; i <= 36; i++) {
+          const daysSince = daysSinceLastHit[i];
+          const avgGap = avgGaps[i];
+          const confidence = calculateConfidence(daysSince, avgGap);
+          const status = getStatus(confidence, daysSince, avgGap);
+          
+          numberStats.push({
+            num: i,
+            totalHits: totalFrequency[i] || 0,
+            lastPlayed: lastPlayed[i],
+            lastTimeSlot: lastTimeSlot[i],
+            lastDayName: lastDayName[i],
+            daysSince: daysSince,
+            avgGap: avgGap,
+            confidence: confidence,
+            statusLabel: status.label,
+            statusEmoji: status.emoji,
+            statusColor: status.color,
+            lineSuite: getLineSuite(i),
+            spirit: getSpiritName(i)
+          });
+        }
+        
+        return numberStats;
+      }
+
+      // Get stats for a specific month range
+      function getMonthStats(weeks, monthRange, gameType) {
+        const timeline = buildStatsTimeline(weeks, 24);
+        
+        // Filter draws within the month range
+        const monthDraws = timeline.filter(item => 
+          item.date >= monthRange.start && item.date <= monthRange.end
+        );
+        
+        if (monthDraws.length === 0) {
+          return { mostPlayed: [], leastPlayed: [], totalDraws: 0, monthName: monthRange.name };
+        }
+        
+        // Count hits per number for the month
+        const hitCounts = {};
+        for (let i = 1; i <= 36; i++) hitCounts[i] = 0;
+        
+        monthDraws.forEach(draw => {
+          hitCounts[draw.n] = (hitCounts[draw.n] || 0) + 1;
+        });
+        
+        // Get last played date for each number within month
+        const lastPlayed = {};
+        for (let i = 1; i <= 36; i++) {
+          const lastDraw = [...monthDraws].reverse().find(d => d.n === i);
+          if (lastDraw) {
+            lastPlayed[i] = lastDraw.date;
+          } else {
+            lastPlayed[i] = null;
+          }
+        }
+        
+        // Create array of number stats
+        const numberStats = [];
+        for (let i = 1; i <= 36; i++) {
+          numberStats.push({
+            num: i,
+            hits: hitCounts[i] || 0,
+            lastPlayed: lastPlayed[i],
+            lineSuite: getLineSuite(i),
+            spirit: getSpiritName(i)
+          });
+        }
+        
+        // Sort by hits (descending) for most played
+        const mostPlayed = [...numberStats]
+          .filter(s => s.hits > 0)
+          .sort((a, b) => b.hits - a.hits)
+          .slice(0, 15);
+        
+        // Sort by hits (ascending) for least played
+        const leastPlayed = [...numberStats]
+          .filter(s => s.hits <= 2)
+          .sort((a, b) => a.hits - b.hits)
+          .slice(0, 15);
+        
+        return {
+          mostPlayed,
+          leastPlayed,
+          totalDraws: monthDraws.length,
+          monthName: monthRange.name
+        };
+      }
+
+      // Render Most Played Card
+      function renderMostPlayedCard(title, statsData) {
+        const data = statsData.mostPlayed;
+        
+        if (!data || data.length === 0) {
+          return `
+            <div class="stats-card" style="background: white !important;">
+              <div class="stats-card-header" style="background: linear-gradient(#000, #000, #000);">
+                <h4>${title}</h4>
+                <p>${statsData.monthName}</p>
+              </div>
+              <div style="text-align: center; padding: 40px; color: #888; background: white;">
+                No data available for this period
+              </div>
+            </div>
+          `;
+        }
+        
+        return `
+          <div class="stats-card" style="background: white !important;">
+            <div class="stats-card-header" style="background: linear-gradient(#000, #000, #000);">
+              <h4>${title}</h4>
+              <p style="font-size: 10px;color: #fff; margin-top: 2px;">${statsData.monthName} • ${statsData.totalDraws} draws</p>
+              <p style="font-size: 9px; margin-top: 2px;">🔥 Highest Frequency Numbers</p>
+            </div>
+            <table class="stats-table" style="background: white;">
+              <thead>
+                <tr><th>#</th><th>Mark</th><th>Spirit</th><th>L/S</th><th>Hits</th><th>Last</th></tr>
+              </thead>
+              <tbody>
+                ${data.map((item, idx) => {
+                  let rankClass = '';
+                  if (idx === 0) rankClass = 'stats-rank-1';
+                  else if (idx === 1) rankClass = 'stats-rank-2';
+                  else if (idx === 2) rankClass = 'stats-rank-3';
+                  
+                  return `
+                    <tr class="${rankClass}" style="background: white;">
+                      <td style="font-weight: 700; color: #ff9d00;">${idx + 1}</td>
+                      <td style="font-weight: 800; font-size: 14px;">${item.num}</td>
+                      <td style="font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70px;" title="${item.spirit}">${item.spirit.substring(0, 8)}</td>
+                      <td style="font-size: 10px;">${item.lineSuite}</td>
+                      <td style="font-weight: 700; color: #10b981;">${item.hits}x</td>
+                      <td style="font-size: 9px;">${formatLastPlayed(item.lastPlayed)}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      // Render Least Played Card
+      function renderLeastPlayedCard(title, statsData) {
+        const data = statsData.leastPlayed;
+        
+        if (!data || data.length === 0) {
+          return `
+            <div class="stats-card" style="background: white !important;">
+              <div class="stats-card-header" style="background: linear-gradient(#000, #000, #000);">
+                <h4>${title}</h4>
+                <p>${statsData.monthName}</p>
+              </div>
+              <div style="text-align: center; padding: 40px; color: #888; background: white;">
+                No data available for this period
+              </div>
+            </div>
+          `;
+        }
+        
+        return `
+          <div class="stats-card" style="background: white !important;">
+            <div class="stats-card-header" style="background: linear-gradient(#000, #000, #000);">
+              <h4>${title}</h4>
+              <p style="font-size: 10px;color: #fff; margin-top: 2px;">${statsData.monthName} • ${statsData.totalDraws} draws</p>
+              <p style="font-size: 9px; margin-top: 2px;">❄️ Cold numbers (0-2 hits)</p>
+            </div>
+            <table class="stats-table" style="background: white;">
+              <thead>
+                <tr><th>#</th><th>Mark</th><th>Spirit</th><th>L/S</th><th>Hits</th><th>Last</th></tr>
+              </thead>
+              <tbody>
+                ${data.map((item, idx) => {
+                  return `
+                    <tr style="background: white;">
+                      <td style="font-weight: 700; color: #ff9d00;">${idx + 1}</td>
+                      <td style="font-weight: 800; font-size: 14px;">${item.num}</td>
+                      <td style="font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70px;" title="${item.spirit}">${item.spirit.substring(0, 8)}</td>
+                      <td style="font-size: 10px;">${item.lineSuite}</td>
+                      <td style="font-weight: 700; color: #ff9f0a;">${item.hits}x</td>
+                      <td style="font-size: 9px;">${formatLastPlayed(item.lastPlayed)}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      // Render Analytics Insight Card - Uses 24 weeks of data, shows top 15 numbers with white background
+      function renderAnalyticsInsightCard(analyticsStats) {
+        if (!analyticsStats || analyticsStats.length === 0) {
+          return `
+            <div class="stats-card" style="background: white !important;">
+              <div class="stats-card-header" style="background: linear-gradient(#000, #000, #000);">
+                <h4>📊 MARKS ANALYTICS INSIGHT</h4>
+                <p>Intelligence Report</p>
+              </div>
+              <div style="text-align: center; padding: 40px; color: #888; background: white;">
+                Loading analytics data...
+              </div>
+            </div>
+          `;
+        }
+        
+        // Get top 15 numbers based on days since last hit (most overdue first)
+        const dueNumbers = [...analyticsStats]
+          .sort((a, b) => b.daysSince - a.daysSince)
+          .slice(0, 15);
+        
+        return `
+          <div class="stats-card" style="background: white !important;">
+            <div class="stats-card-header" style="background: linear-gradient(#000, #000, #000);">
+              <h4>📊 MARKS ANALYTICS INSIGHT</h4>
+              <p style="font-size: 10px;color: #fff; margin-top: 2px;">Intelligence Report • Based on 24 weeks of data</p>
+              <p style="font-size: 10px;color: #fff; margin-top: 2px;">🎯 Numbers with highest probability to appear next</p>
+            </div>
+            <div style="padding: 12px; max-height: 500px; overflow-y: auto; background: white;">
+              ${dueNumbers.map((item, idx) => {
+                const statusColor = item.statusColor;
+                const barWidth = Math.min(item.confidence, 100);
+                const emoji = item.statusEmoji;
+                const label = item.statusLabel;
+                
+                return `
+                  <div style="margin-bottom: 12px; padding: 10px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid ${statusColor};">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                      <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 42px; height: 42px; border-radius: 50%; background: ${numberColors[String(item.num).padStart(2, "0")] || "#ff9f0a"}; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; color: #000;">${item.num}</div>
+                        <div>
+                          <div style="font-weight: 800; font-size: 14px; color: #333;">${item.spirit}</div>
+                          <div style="font-size: 9px; color: ${statusColor};">${emoji} ${label}</div>
+                        </div>
+                      </div>
+                      <div style="text-align: right;">
+                        <div style="font-size: 9px; color: #888;">CONFIDENCE</div>
+                        <div style="font-size: 20px; font-weight: 800; color: ${statusColor};">${item.confidence}%</div>
+                      </div>
+                    </div>
+                    
+                    <div style="width: 100%; height: 4px; background: #e0e0e0; border-radius: 4px; overflow: hidden; margin: 8px 0;">
+                      <div style="width: ${barWidth}%; height: 100%; background: ${statusColor};"></div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 10px; color: #666;">
+                      <div><span style="color: #888;"></span> <strong>${item.lineSuite}</strong></div>
+                      <div><span style="color: #888;">Days Since:</span> <strong style="color: ${statusColor};">${item.daysSince}d</strong></div>
+                      <div><span style="color: #888;">Total Hits:</span> <strong>${item.totalHits}x</strong></div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 9px; color: #999; padding-top: 6px; border-top: 1px solid #eee;">
+                      <span>📊 Avg Gap: ${item.avgGap}d</span>
+                      <span>📅 Last: ${formatLastPlayedFull(item.lastPlayed)} ${item.lastTimeSlot ? `• ${item.lastTimeSlot}` : ''}</span>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      // Main function to render swipeable stats dashboard
+      function renderStatsDashboard(weeks, gameType) {
+        const monthRanges = getMonthRanges();
+        
+        // Get stats for current month (for Most Played and Least Played cards)
+        const currentMonthStats = getMonthStats(weeks, monthRanges.current, gameType);
+        
+        // Get stats for previous month
+        const previousMonthStats = getMonthStats(weeks, monthRanges.previous, gameType);
+        
+        // Get full analytics stats using 24 weeks of data (for the insight card)
+        const analyticsStats = getFullAnalyticsStats(weeks);
+        
+        return `
+          <div class="stats-swipe-container">
+            <div class="stats-swipe-wrapper" id="statsSwipeWrapper-${gameType}">
+              <!-- Card 1: MOST PLAYED - Current Month -->
+              ${renderMostPlayedCard(`🥇 MOST PLAYED - ${monthRanges.current.name.toUpperCase()}`, currentMonthStats)}
+              
+              <!-- Card 2: LEAST PLAYED - Current Month -->
+              ${renderLeastPlayedCard(`🥉 LEAST PLAYED - ${monthRanges.current.name.toUpperCase()}`, currentMonthStats)}
+              
+              <!-- Card 3: MOST PLAYED - Previous Month -->
+              ${renderMostPlayedCard(`📊 MOST PLAYED - ${monthRanges.previous.name.toUpperCase()}`, previousMonthStats)}
+              
+              <!-- Card 4: LEAST PLAYED - Previous Month -->
+              ${renderLeastPlayedCard(`📉 LEAST PLAYED - ${monthRanges.previous.name.toUpperCase()}`, previousMonthStats)}
+              
+              <!-- Card 5: MARKS ANALYTICS INSIGHT (24 weeks data, white background) -->
+              ${renderAnalyticsInsightCard(analyticsStats)}
+            </div>
+            
+            <!-- Navigation Buttons -->
+            <div class="stats-nav">
+              <button class="stats-nav-btn" onclick="scrollStatsLeft('${gameType}')">◀ Previous</button>
+              <button class="stats-nav-btn" onclick="scrollStatsRight('${gameType}')">Next ▶</button>
+            </div>
+            
+            <!-- Dot Indicators -->
+            <div class="stats-indicators" id="statsIndicators-${gameType}">
+              <div class="stats-dot active"></div>
+              <div class="stats-dot"></div>
+              <div class="stats-dot"></div>
+              <div class="stats-dot"></div>
+              <div class="stats-dot"></div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Scroll functions for swipeable container
+      function scrollStatsLeft(gameType) {
+        const wrapper = document.getElementById(`statsSwipeWrapper-${gameType}`);
+        if (wrapper) {
+          wrapper.scrollBy({ left: -380, behavior: 'smooth' });
+          setTimeout(() => updateStatsIndicators(gameType), 100);
+        }
+      }
+
+      function scrollStatsRight(gameType) {
+        const wrapper = document.getElementById(`statsSwipeWrapper-${gameType}`);
+        if (wrapper) {
+          wrapper.scrollBy({ left: 380, behavior: 'smooth' });
+          setTimeout(() => updateStatsIndicators(gameType), 100);
+        }
+      }
+
+      function updateStatsIndicators(gameType) {
+        const wrapper = document.getElementById(`statsSwipeWrapper-${gameType}`);
+        const indicators = document.getElementById(`statsIndicators-${gameType}`);
+        if (!wrapper || !indicators) return;
+        
+        const scrollLeft = wrapper.scrollLeft;
+        const cardWidth = wrapper.children[0]?.offsetWidth || 380;
+        const gap = 16;
+        const currentIndex = Math.round(scrollLeft / (cardWidth + gap));
+        
+        const dots = indicators.querySelectorAll('.stats-dot');
+        dots.forEach((dot, idx) => {
+          if (idx === currentIndex) {
+            dot.classList.add('active');
+          } else {
+            dot.classList.remove('active');
+          }
+        });
+      }
+
+      // Attach scroll event listener for dot indicators
+      function attachStatsScrollListener(gameType) {
+        const wrapper = document.getElementById(`statsSwipeWrapper-${gameType}`);
+        if (wrapper) {
+          wrapper.removeEventListener('scroll', () => updateStatsIndicators(gameType));
+          wrapper.addEventListener('scroll', () => updateStatsIndicators(gameType));
+        }
+      }
+
       // Main function to render the export table with all charts for a given game
       function renderExportTable(game) {
         const container = document.getElementById(`modalContent-${game}`);
@@ -6927,6 +7650,9 @@
                               ${renderSuitesPlayedChart(currentWeekDraws)}
                           </div>
                       </div>
+                      
+                      <!-- NEW: Monthly Stats Dashboard - Swipeable -->
+                      ${renderStatsDashboard(historyWeeks, "PLAY_WHE")}
 
                       <!-- NEW: Full Width Lines and Suites Cycle Tracking Charts -->
                       <div style="margin-bottom: 20px;">
