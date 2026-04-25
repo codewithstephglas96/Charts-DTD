@@ -6778,13 +6778,13 @@
         const mostPlayed = [...numberStats]
           .filter(s => s.hits > 0)
           .sort((a, b) => b.hits - a.hits)
-          .slice(0, 15);
+          .slice(0, 18);
         
         // Sort by hits (ascending) for least played
         const leastPlayed = [...numberStats]
           .filter(s => s.hits <= 2)
           .sort((a, b) => a.hits - b.hits)
-          .slice(0, 15);
+          .slice(0, 18);
         
         return {
           mostPlayed,
@@ -6901,7 +6901,7 @@
           return `
             <div class="stats-card" style="background: white !important;">
               <div class="stats-card-header" style="background: linear-gradient(#000, #000, #000);">
-                <h4>📊 MARKS ANALYTICS INSIGHT</h4>
+                <h4>♠️ MARKS ANALYTICS INSIGHT ♠️</h4>
                 <p>Intelligence Report</p>
               </div>
               <div style="text-align: center; padding: 40px; color: #888; background: white;">
@@ -6911,17 +6911,17 @@
           `;
         }
         
-        // Get top 15 numbers based on days since last hit (most overdue first)
+        // Get top 18 numbers based on days since last hit (most overdue first)
         const dueNumbers = [...analyticsStats]
           .sort((a, b) => b.daysSince - a.daysSince)
-          .slice(0, 15);
+          .slice(0, 18);
         
         return `
           <div class="stats-card" style="background: white !important;">
             <div class="stats-card-header" style="background: linear-gradient(#000, #000, #000);">
-              <h4>📊 MARKS ANALYTICS INSIGHT</h4>
+              <h4>♠️ MARKS ANALYTICS INSIGHT ♠️</h4>
               <p style="font-size: 10px;color: #fff; margin-top: 2px;">Intelligence Report • Based on 24 weeks of data</p>
-              <p style="font-size: 10px;color: #fff; margin-top: 2px;">🎯 Numbers with highest probability to appear next</p>
+              <p style="font-size: 10px;color: #fff; margin-top: 2px;">Numbers with highest probability to appear next</p>
             </div>
             <div style="padding: 12px; max-height: 500px; overflow-y: auto; background: white;">
               ${dueNumbers.map((item, idx) => {
@@ -6991,10 +6991,10 @@
               ${renderLeastPlayedCard(`🥉 LEAST PLAYED - ${monthRanges.current.name.toUpperCase()}`, currentMonthStats)}
               
               <!-- Card 3: MOST PLAYED - Previous Month -->
-              ${renderMostPlayedCard(`📊 MOST PLAYED - ${monthRanges.previous.name.toUpperCase()}`, previousMonthStats)}
+              ${renderMostPlayedCard(`🔺 MOST PLAYED - ${monthRanges.previous.name.toUpperCase()}`, previousMonthStats)}
               
               <!-- Card 4: LEAST PLAYED - Previous Month -->
-              ${renderLeastPlayedCard(`📉 LEAST PLAYED - ${monthRanges.previous.name.toUpperCase()}`, previousMonthStats)}
+              ${renderLeastPlayedCard(`🔻 LEAST PLAYED - ${monthRanges.previous.name.toUpperCase()}`, previousMonthStats)}
               
               <!-- Card 5: MARKS ANALYTICS INSIGHT (24 weeks data, white background) -->
               ${renderAnalyticsInsightCard(analyticsStats)}
