@@ -3066,15 +3066,15 @@
           );
       }
 
-      // ========== RENDER COMPLETE GAME UI WITH NAVIGATION ==========
-      async function renderGameUI(game, preserveOffset = true) {
+        // ========== RENDER COMPLETE GAME UI WITH NAVIGATION ==========
+        async function renderGameUI(game, preserveOffset = true) {
         const container = document.getElementById(`${game}-container`);
         const gameKey = game === "pw" ? "playwhe" : game === "p2" ? "pick2" : "pick4";
         const allWeeks = gameState[gameKey].fullWeeks || [];
         
         if (!allWeeks || allWeeks.length === 0) {
-          container.innerHTML = '<div style="text-align:center; padding:40px;">Loading...</div>';
-          return;
+            container.innerHTML = '<div style="text-align:center; padding:40px;">Loading...</div>';
+            return;
         }
         
         const gameType = game === "pw" ? "PLAY_WHE" : game === "p2" ? "PICK_2" : "PICK_4";
@@ -3087,10 +3087,10 @@
         // Determine if evening draw has passed for current day highlighting
         let isAfterEvening = false;
         if (currentWeek) {
-          const todayData = currentWeek.days.find(d => d.dayName === todayName);
-          if (todayData && todayData.draws.EVE !== "-" && todayData.draws.EVE !== "PENDING") {
+            const todayData = currentWeek.days.find(d => d.dayName === todayName);
+            if (todayData && todayData.draws.EVE !== "-" && todayData.draws.EVE !== "PENDING") {
             isAfterEvening = true;
-          }
+            }
         }
         let highlightDayName = isAfterEvening ? dayNames[(today.getDay() + 1) % 7] : todayName;
         
@@ -3104,9 +3104,9 @@
         // Get saved offset or use current
         if (!window.historyOffsets) window.historyOffsets = {};
         if (preserveOffset && window.historyOffsets[game] !== undefined) {
-          // Keep existing offset
+            // Keep existing offset
         } else {
-          window.historyOffsets[game] = 0;
+            window.historyOffsets[game] = 0;
         }
         
         let currentOffset = window.historyOffsets[game];
@@ -3114,7 +3114,7 @@
         // Clamp offset to valid range
         if (currentOffset < 0) currentOffset = 0;
         if (currentOffset >= previousWeeks.length && previousWeeks.length > 0) {
-          currentOffset = previousWeeks.length - 1;
+            currentOffset = previousWeeks.length - 1;
         }
         window.historyOffsets[game] = currentOffset;
         
@@ -3124,75 +3124,106 @@
         let hasNewer = false;
         
         if (previousWeeks.length > 0) {
-          if (currentOffset >= 0 && currentOffset < previousWeeks.length) {
+            if (currentOffset >= 0 && currentOffset < previousWeeks.length) {
             previousWeekToShow = previousWeeks[currentOffset];
             hasOlder = currentOffset + 1 < previousWeeks.length;
             hasNewer = currentOffset > 0;
-          }
+            }
         }
         
-        // Build the HTML
+        // ========== BUILD DISPLAY WEEKS FOR HIGHLIGHTING ANALYSIS ==========
+        // For proper Pick 2/Pick 4 highlighting, we need to analyze the displayed previous week 
+        // together with the current week. So we create an array with both weeks.
+        let displayWeeksForAnalysis = [];
+        if (previousWeekToShow) {
+            displayWeeksForAnalysis.push(previousWeekToShow);
+        }
+        displayWeeksForAnalysis.push(currentWeek);
+        
+        // Build the table HTML using buildDayToDayTable which analyzes both weeks together
+        // This gives us the proper color-coded highlighting for Pick 2 and Pick 4
+        const fullTableHtml = buildDayToDayTable(displayWeeksForAnalysis, gameType, game);
+        
+        // Now we need to split the combined table back into separate previous and current week tables
+        // with navigation preserved on the previous week section.
+        
+        // Find where the previous week ends and current week begins in the combined HTML
+        // The combined HTML from buildDayToDayTable has two tables: first previous, then current
+        // with a branding separator in between.
+        
+        let previousWeekHtml = '';
+        let currentWeekHtml = '';
+        
+        // Look for the branding separator that separates the two weeks
+        const separatorPattern = '<div style="text-align:center; padding:2px; opacity:0.1; font-weight:900; letter-spacing:8px; font-size:10px;">CODEWITHGLASGOW</div>';
+        const separatorIndex = fullTableHtml.indexOf(separatorPattern);
+        
+        if (separatorIndex !== -1) {
+            // Split the HTML at the separator
+            previousWeekHtml = fullTableHtml.substring(0, separatorIndex);
+            currentWeekHtml = fullTableHtml.substring(separatorIndex + separatorPattern.length);
+        } else {
+            // Fallback: just use the full table as current week
+            currentWeekHtml = fullTableHtml;
+            previousWeekHtml = '';
+        }
+        
+        // Build the final HTML with navigation wrapper around the previous week
         let html = '';
         
-        // Show previous week with navigation if available
-        if (previousWeekToShow) {
-          const weekNumber = currentOffset + 1;
-          const totalPrevWeeks = previousWeeks.length;
-          const dateRange = formatDateRange(previousWeekToShow);
-          
-          html += `
+        if (previousWeekToShow && previousWeekHtml) {
+            const weekNumber = currentOffset + 1;
+            const totalPrevWeeks = previousWeeks.length;
+            const dateRange = formatDateRange(previousWeekToShow);
+            
+            html += `
             <div style="position: relative; margin-bottom: 20px;">
-              <div class="table-wrapper">
+                <div class="table-wrapper" style="margin-bottom: 0;">
                 <div class="table-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                  <span>📆 PREVIOUS WEEK (${dateRange})</span>
-                  <div style="display: flex; gap: 8px;">
+                    <span>📆 PREVIOUS WEEK (${dateRange})</span>
+                    <div style="display: flex; gap: 8px;">
                     ${hasOlder ? `<button class="nav-next-btn" data-game="${game}" data-direction="older" style="background: #ff9d00; border: none; border-radius: 20px; padding: 6px 16px; font-size: 12px; font-weight: bold; cursor: pointer; color: #000;">← Older</button>` : '<button disabled style="background: #555; border: none; border-radius: 20px; padding: 6px 16px; font-size: 12px; opacity: 0.5; color: #fff;">← Older</button>'}
                     <span style="background: #334155; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold;">${weekNumber} of ${totalPrevWeeks}</span>
                     ${hasNewer ? `<button class="nav-prev-btn" data-game="${game}" data-direction="newer" style="background: #ff9d00; border: none; border-radius: 20px; padding: 6px 16px; font-size: 12px; font-weight: bold; cursor: pointer; color: #000;">Recent →</button>` : '<button disabled style="background: #555; border: none; border-radius: 20px; padding: 6px 16px; font-size: 12px; opacity: 0.5; color: #fff;">Recent →</button>'}
-                  </div>
+                    </div>
                 </div>
-              </div>
-              ${buildSingleWeekTable(previousWeekToShow, gameType, game, isAfterEvening, highlightDayName)}
+                </div>
+                ${previousWeekHtml}
             </div>
-          `;
-          
-          // Add branding separator
-          html += '<div style="text-align:center; padding:2px; opacity:0.1; font-weight:900; letter-spacing:8px; font-size:10px; margin: 10px 0;">CODEWITHGLASGOW</div>';
-        } else {
-          // No previous weeks available
-          html += `
+            `;
+            
+            // Add branding separator between weeks
+            html += '<div style="text-align:center; padding:2px; opacity:0.1; font-weight:900; letter-spacing:8px; font-size:10px; margin: 10px 0;">CODEWITHGLASGOW</div>';
+        } else if (!previousWeekToShow) {
+            html += `
             <div style="margin-bottom: 20px;">
-              <div class="table-wrapper">
+                <div class="table-wrapper">
                 <div class="table-header">
-                  <span>📆 PREVIOUS WEEK</span>
+                    <span>📆 PREVIOUS WEEK</span>
                 </div>
                 <div style="text-align: center; padding: 40px; color: #888;">No previous week data available</div>
-              </div>
+                </div>
             </div>
-          `;
+            `;
         }
         
-        // Show current week (always visible, no navigation on this one)
-        html += `
-          <div style="margin-top: 0;">
-            <div class="table-wrapper">
-              <div class="table-header">
-                <span>📅 CURRENT WEEK</span>
-                <span style="font-size: 12px; opacity: 0.8;">${formatDateRange(currentWeek)}</span>
-              </div>
-              ${buildSingleWeekTable(currentWeek, gameType, game, isAfterEvening, highlightDayName)}
+        // Add current week (without navigation wrapper)
+        if (currentWeekHtml) {
+            html += `
+            <div style="margin-top: 0;">
+                ${currentWeekHtml}
             </div>
-          </div>
-        `;
+            `;
+        }
         
         container.innerHTML = html;
         
         // Attach event listeners to navigation buttons
         container.querySelectorAll('.nav-prev-btn, .nav-next-btn').forEach(btn => {
-          btn.removeEventListener('click', handleNavClick);
-          btn.addEventListener('click', handleNavClick);
+            btn.removeEventListener('click', handleNavClick);
+            btn.addEventListener('click', handleNavClick);
         });
-      }
+        }
 
       function handleNavClick(e) {
         const btn = e.currentTarget;
